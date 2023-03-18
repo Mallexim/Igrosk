@@ -1,0 +1,207 @@
+body {
+  background: var(--color-shadow-lighter); /*   #BA8C5E */
+  transition: background-color 250ms ease-in-out;
+}
+
+:root {
+  --border-width: calc(var(--diameter-tile) / 60);
+  --diameter-board: min(90vw, 90vh);
+  --diameter-tile: calc(1 / 8 * var(--diameter-board));
+  --edge-width: calc((min(100vw, 100vh) - var(--diameter-board)) * 0.3);
+  --color-danger: tomato;
+  --color-success: #1d83e0;
+  --color-white: #f0f0f0;
+  --color-black: #222;
+  --color-board-hue: 30;
+  --color-board-sat: 40%;
+  --color-shadow: hsl(var(--color-board-hue), var(--color-board-sat), 50%); /* #B3804D */
+  --color-shadow-lighter: hsl(var(--color-board-hue), var(--color-board-sat), 55%); /*   #BA8C5E */
+  --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --color-background: var(--color-shadow-lighter);
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--color-shadow-lighter); /*   #BA8C5E */
+/*   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow); */
+/*   height: var(--diameter-board); */
+  margin: calc((100vh - var(--diameter-board)) * 0.5) 
+    calc((100vw - var(--diameter-board)) * 0.5);
+  position: relative;
+/*   width: var(--diameter-board); */
+}
+
+.chess-board {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  max-width: 600px; /* adjust as needed */
+  background: var(--color-shadow-lighter); /*   #BA8C5E */
+  box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow);
+/*   margin: 0 auto; */
+}
+
+aside {
+  display: flex;
+  justify-content: space-between;
+/*   left: 0; */
+/*   position: absolute; */
+  top: calc(var(--edge-width) * -0.55);
+  transform: translateY(-50%);
+  width: 100%;
+  z-index: 999;
+}
+aside div {
+  align-items: center;
+  color: white;
+  display: flex;
+}
+aside div > * {
+  align-items: center;
+  display: flex;
+}
+aside div > * + * {
+  margin-left: calc(var(--border-width) * 2);
+}
+
+aside div h3,
+aside div label {
+  font-size: calc(var(--edge-width) * 0.9);
+  height: calc(var(--edge-width) * 0.3);
+  line-height: 1;
+/*   margin-bottom: 0; */
+/*   margin-top: 0; */
+  text-transform: uppercase;
+}
+
+/* aside div h1, {
+  font-size: calc(var(--edge-width) * 0.3);
+  height: calc(var(--edge-width) * 0.3);
+  line-height: 1;
+  margin-bottom: 0; 
+  margin-top: 0; 
+  text-transform: uppercase;
+} */
+
+aside div label {
+  cursor: pointer;
+  max-width: calc(var(--edge-width) * 1);
+  max-height: calc(var(--edge-width) * 1);
+}
+
+aside div input {
+  left: -99999px;
+  position: absolute;
+}
+
+aside div input + * {
+  opacity: 0.5;
+}
+aside div input:checked + * {
+  font-weight: bold;
+  opacity: 1;
+}
+
+aside div svg {
+  height: calc(var(--edge-width) * 2);
+  width: auto;
+}
+
+.switch.circle.active {
+  border: 1px solid #94B2D1;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.square {
+  width: calc(100% / 6);
+  height: 0;
+  padding-bottom: calc(100% / 6);
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-shadow-lighter);
+  background-color: currentcolor;
+}
+
+.square:hover {
+  box-shadow: inset 0 0 0 var(--border-width) #94B2D1;
+}
+
+.light {
+  background: #f0f0f0;
+  border: 1px solid var(--color-shadow);
+}
+
+.dark {
+  background: #222;
+  border: 1px solid var(--color-shadow);
+}
+
+.white {
+  background-color: hsl(var(--color-board-hue), var(--color-board-sat), 62%);
+}
+
+.black {
+  background-color: hsl(var(--color-board-hue), var(--color-board-sat), 70%);
+/*   background-color: #654d37; */
+}
+
+.oval {
+  width: 85%;
+  height: 30%;
+  border-radius: 50%;
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+/*   background-color: red; */
+}
+
+
+.child {
+  position: absolute;
+  margin: 2px;
+}
+
+.child:hover {
+  border: 2px solid #94B2D1;
+}
+
+.child:nth-child(1) {
+  bottom: 0%;
+}
+
+.child:nth-child(2) {
+  bottom: 15%;
+}
+
+.child:nth-child(3) {
+  bottom: 30%
+}
+
+.child:nth-child(4) {
+  bottom: 45%
+}
+
+.white {
+  color: #f0f0f0
+}
+
+svg {
+  --fill: var(--color-black);
+  --stroke: var(--color-shadow);
+  fill: var(--fill);
+}
+
+svg.white { --fill: var(--color-white); }
+svg.black { --fill: var(--color-black); }
