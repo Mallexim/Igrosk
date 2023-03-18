@@ -1,28 +1,27 @@
-const switches = document.querySelectorAll('.switch');
-let activeSwitch = document.querySelector('.switch.active');
-switches.forEach(switchEl => {
-  switchEl.addEventListener('click', () => {
+const switches = document.querySelectorAll(".switch");
+let activeSwitch = document.querySelector(".switch.active");
+switches.forEach((switchEl) => {
+  switchEl.addEventListener("click", () => {
     if (activeSwitch) {
-      activeSwitch.classList.remove('active');
-      
+      activeSwitch.classList.remove("active");
     }
     activeSwitch = switchEl;
-    activeSwitch.classList.add('active');
+    activeSwitch.classList.add("active");
   });
-});d
+});
 
-const removeAll = document.getElementById('remove-all');
-
-removeAll.addEventListener('click', () => {
-  const squares = document.querySelectorAll('.square');
-  squares.forEach(square => {
+function removeAll() {
+  const squares = document.querySelectorAll(".square");
+  squares.forEach((square) => {
     while (square.firstChild) {
       square.removeChild(square.firstChild);
     }
   });
-});
+}
+const removeAllButton = document.getElementById("remove-all");
+removeAllButton.addEventListener("click", removeAll);
 
-const squares = document.querySelectorAll('.square');
+const squares = document.querySelectorAll(".square");
 
 const parents = document.querySelectorAll(".square");
 
@@ -35,45 +34,56 @@ parents.forEach((parent) => {
       parent.appendChild(newDiv);
     }
   });
-  
-squares.forEach(square => {
-  square.addEventListener('click', () => {
+});
+
+squares.forEach((square) => {
+  square.addEventListener("click", () => {
     let text = "";
-  squares.forEach(square => {
-    for (let i = 0; i < square.children.length; i++) {
-      const child = square.children[i];
-      if (child.classList.contains('dark')) {
-        text += "1";
-      } else if (child.classList.contains('light')) {
-        text += "0";
+    squares.forEach((square) => {
+      for (let i = 0; i < square.children.length; i++) {
+        const child = square.children[i];
+        if (child.classList.contains("dark")) {
+          text += "1";
+        } else if (child.classList.contains("light")) {
+          text += "0";
+        }
       }
-      
-    }
-    text += "/";
-  });
+      text += "/";
+    });
 
     console.log(text);
-    const outputTextarea = document.querySelector('.output');
+    const outputTextarea = document.querySelector(".output");
     outputTextarea.value = text;
   });
 });
 
-const output = document.querySelector('.output');
+const output = document.querySelector(".output");
 
-output.addEventListener('input', () => {
-  const values = output.value.trim().split('\/');
+output.addEventListener("input", () => {
+  const values = output.value.trim().split("/");
   squares.forEach((square, index) => {
-    square.innerHTML = '';
+    square.innerHTML = "";
     for (let i = 0; i < values[index].length; i++) {
-      const child = document.createElement('div');
-      if (values[index][i] === '1') {
-        child.classList.add('child', 'oval', 'dark');
-      } else if (values[index][i] === '0') {
-        child.classList.add('child', 'oval', 'light');
+      const child = document.createElement("div");
+      if (values[index][i] === "1") {
+        child.classList.add("child", "oval", "dark");
+      } else if (values[index][i] === "0") {
+        child.classList.add("child", "oval", "light");
       }
       square.appendChild(child);
     }
   });
 });
-});
 
+var x;
+var y;
+squares.forEach((square, index) => {
+  square.addEventListener("click", () => {
+    x = Math.floor(index / 6);
+    y = index % 6;
+  });
+});
+const test = document.querySelector(".test");
+test.addEventListener("click", () => {
+  console.log([x, y]);
+});
