@@ -75,7 +75,6 @@ output.addEventListener("input", () => {
   });
 });
 
-//Testing reading coordinates
 var x;
 var y;
 squares.forEach((square, index) => {
