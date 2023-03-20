@@ -30,58 +30,71 @@ function removeAllSquares() {
     square.innerHTML = "";
   });
 }
+
 const removeAllButton = document.getElementById("remove-all");
 removeAllButton.addEventListener("click", removeAllSquares);
 
-// Add click event listener to squares
-squares.forEach((square, index) => {
-  square.addEventListener("click", () => {
-    x = Math.floor(index / 6);
-    y = index % 6;
-    let text = "";
-    squares.forEach((squareElement) => {
-      for (let i = 0; i < squareElement.children.length; i++) {
-        const child = squareElement.children[i];
-        if (child.classList.contains("dark")) {
-          text += "1";
-        } else if (child.classList.contains("light")) {
-          text += "0";
-        }
+function getBoardState(squares) {
+  let text = "";
+  squares.forEach((squareElement, index) => {
+    let x = Math.floor(index / 6);
+    let y = index % 6;
+    for (let i = 0; i < squareElement.children.length; i++) {
+      const child = squareElement.children[i];
+      if (child.classList.contains("dark")) {
+        text += "1";
+      } else if (child.classList.contains("light")) {
+        text += "0";
       }
-      text += "/";
-    });
-    outputTextarea.value = text;
+    }
+    text += "/";
+  });
+  return text;
+}
+
+function addPieceOnClick(square) {
+  // Check if the square has less than 4 child elements
+  if (square.children.length < 4) {
+    // Create a new div element with the classes .child, .oval, and .light or .dark depending on the value of the color variable
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("child", "oval", color ? "dark" : "light");
+    // Append the new div element to the clicked square
+    square.appendChild(newDiv);
+  }
+}
+
+// Loop through each square element and add a click event listener
+squares.forEach((square) => {
+  square.addEventListener("click", () => {
+    // Call the addPieceOnClick function with the clicked square element as the argument
+    addPieceOnClick(square);
+    // Update the value of the outputTextarea element with the current state of the board
+    outputTextarea.value = getBoardState(squares);
   });
 });
 
-// Add input event listener to outputTextarea
-outputTextarea.addEventListener("input", () => {
+function setBoardState() {
+  // split the input value at each "/" character
   const values = outputTextarea.value.trim().split("/");
+  // clear the contents of all the squares
+  removeAllSquares();
   squares.forEach((squareElement, index) => {
-    squareElement.innerHTML = "";
+    // loop through each character in the corresponding values array
     for (let i = 0; i < values[index].length; i++) {
+      // create a new div element with the appropriate class based on the character value
       const child = document.createElement("div");
       if (values[index][i] === "1") {
         child.classList.add("child", "oval", "dark");
       } else if (values[index][i] === "0") {
         child.classList.add("child", "oval", "light");
       }
+      // append the new div element to the square element
       squareElement.appendChild(child);
     }
   });
-});
+}
 
-// Add click event listener to squares
-squares.forEach((square) => {
-  square.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (square.children.length < 4) {
-      const newDiv = document.createElement("div");
-      newDiv.classList.add("child", "oval", activeSwitch.classList[2]);
-      square.appendChild(newDiv);
-    }
-  });
-});
+outputTextarea.addEventListener("input", setBoardState);
 
 function placePiece(row, col, color) {
   const index = row * 6 + col;
