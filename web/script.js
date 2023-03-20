@@ -1,89 +1,82 @@
-const switches = document.querySelectorAll(".switch");
-let activeSwitch = document.querySelector(".switch.active");
-switches.forEach((switchEl) => {
-  switchEl.addEventListener("click", () => {
+const switches = document.querySelectorAll('.switch');
+let activeSwitch = document.querySelector('.switch.active');
+const squares = document.querySelectorAll('.square');
+const outputTextarea = document.querySelector('.output');
+let x;
+let y;
+
+// Add click event listener to switches
+switches.forEach((switchElement) => {
+  switchElement.addEventListener('click', () => {
     if (activeSwitch) {
-      activeSwitch.classList.remove("active");
+      activeSwitch.classList.remove('active');
     }
-    activeSwitch = switchEl;
-    activeSwitch.classList.add("active");
+    activeSwitch = switchElement;
+    activeSwitch.classList.add('active');
   });
 });
 
-function removeAll() {
-  const squares = document.querySelectorAll(".square");
+// Remove all child elements from squares
+function removeAllSquares() {
   squares.forEach((square) => {
-    while (square.firstChild) {
-      square.removeChild(square.firstChild);
-    }
+    square.innerHTML = '';
   });
 }
-const removeAllButton = document.getElementById("remove-all");
-removeAllButton.addEventListener("click", removeAll);
+const removeAllButton = document.getElementById('remove-all');
+removeAllButton.addEventListener('click', removeAllSquares);
 
-const squares = document.querySelectorAll(".square");
-
-const parents = document.querySelectorAll(".square");
-
-parents.forEach((parent) => {
-  parent.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (parent.children.length < 4) {
-      const newDiv = document.createElement("div");
-      newDiv.classList.add("child", "oval", activeSwitch.classList[2]);
-      parent.appendChild(newDiv);
-    }
-  });
-});
-
-squares.forEach((square) => {
-  square.addEventListener("click", () => {
-    let text = "";
-    squares.forEach((square) => {
-      for (let i = 0; i < square.children.length; i++) {
-        const child = square.children[i];
-        if (child.classList.contains("dark")) {
-          text += "1";
-        } else if (child.classList.contains("light")) {
-          text += "0";
+// Add click event listener to squares
+squares.forEach((square, index) => {
+  square.addEventListener('click', () => {
+    x = Math.floor(index / 6);
+    y = index % 6;
+    let text = '';
+    squares.forEach((squareElement) => {
+      for (let i = 0; i < squareElement.children.length; i++) {
+        const child = squareElement.children[i];
+        if (child.classList.contains('dark')) {
+          text += '1';
+        } else if (child.classList.contains('light')) {
+          text += '0';
         }
       }
-      text += "/";
+      text += '/';
     });
-
-    console.log(text);
-    const outputTextarea = document.querySelector(".output");
     outputTextarea.value = text;
   });
 });
 
-const output = document.querySelector(".output");
-
-output.addEventListener("input", () => {
-  const values = output.value.trim().split("/");
-  squares.forEach((square, index) => {
-    square.innerHTML = "";
+// Add input event listener to outputTextarea
+outputTextarea.addEventListener('input', () => {
+  const values = outputTextarea.value.trim().split('/');
+  squares.forEach((squareElement, index) => {
+    squareElement.innerHTML = '';
     for (let i = 0; i < values[index].length; i++) {
-      const child = document.createElement("div");
-      if (values[index][i] === "1") {
-        child.classList.add("child", "oval", "dark");
-      } else if (values[index][i] === "0") {
-        child.classList.add("child", "oval", "light");
+      const child = document.createElement('div');
+      if (values[index][i] === '1') {
+        child.classList.add('child', 'oval', 'dark');
+      } else if (values[index][i] === '0') {
+        child.classList.add('child', 'oval', 'light');
       }
-      square.appendChild(child);
+      squareElement.appendChild(child);
     }
   });
 });
 
-var x;
-var y;
-squares.forEach((square, index) => {
-  square.addEventListener("click", () => {
-    x = Math.floor(index / 6);
-    y = index % 6;
+// Add click event listener to squares
+squares.forEach((square) => {
+  square.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (square.children.length < 4) {
+      const newDiv = document.createElement('div');
+      newDiv.classList.add('child', 'oval', activeSwitch.classList[2]);
+      square.appendChild(newDiv);
+    }
   });
 });
-const test = document.querySelector(".test");
-test.addEventListener("click", () => {
+
+// Add click event listener to test button
+const testButton = document.querySelector('.test');
+testButton.addEventListener('click', () => {
   console.log([x, y]);
 });
