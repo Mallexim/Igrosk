@@ -97,10 +97,33 @@ function placePiece(row, col, color) {
   }
 }
 
+function removePiece(row, col) {
+  const index = row * 6 + col;
+  const square = squares[index];
+
+  // Check if the square has any child elements
+  if (square.children.length > 0) {
+    // Remove the last child element from the square
+    square.removeChild(square.lastChild);
+  }
+}
+
 // Add click event listener to test button
 const testButton = document.querySelector(".test");
 testButton.addEventListener("click", () => {
   // console.log([x, y]);
   outputTextarea2.value = [x, y, color];
   placePiece(x, y, color);
+});
+
+const deletePieceButton = document.querySelector(".deletePiece");
+const deletePieceText = document.querySelector(".deletePieceText");
+deletePieceButton.addEventListener("click", () => {
+  const coordinates = deletePieceText.value.trim().split(",");
+  if (coordinates.length === 2) {
+    let row = parseInt(coordinates[0]);
+    let col = parseInt(coordinates[1]);
+    console.log(`x: ${row}, y: ${col}`);
+    removePiece(row, col);
+  }
 });
