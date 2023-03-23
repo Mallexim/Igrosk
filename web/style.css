@@ -42,7 +42,7 @@ body {
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
-  gap: 40px 20px;
+  gap: 40px 30px;
   background: var(--color-shadow-lighter); /*   #BA8C5E */
   /*   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow); */
   /*   height: var(--diameter-board); */
@@ -57,8 +57,7 @@ body {
   height: 100%;
   max-width: 600px; /* adjust as needed */
   background: var(--color-shadow-lighter); /*   #BA8C5E */
-  box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter),
-    0 0 0 var(--edge-width) var(--color-shadow);
+  box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow);
     margin: 0 auto;
 }
 
@@ -87,7 +86,7 @@ aside div > * + * {
   margin-left: calc(var(--border-width) * 2);
 }
 
-aside div h3,
+h3,
 aside div label {
   font-size: calc(var(--edge-width) * 0.9);
   height: calc(var(--edge-width) * 0.3);
@@ -230,11 +229,20 @@ svg.black {
   --fill: var(--color-black);
 }
 
-.output {
+input {
   border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
+  margin: 2px;
 /*   width: 100%; */
+}
+
+.card {
+  background: var(--color-shadow);
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #222;
+    
 }
 
 @media all and (max-width: 700px) {
