@@ -237,6 +237,13 @@ input {
 /*   width: 100%; */
 }
 
+.ccontainer {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .card {
   background: var(--color-shadow);
   padding: 10px;
@@ -250,8 +257,14 @@ input {
     /* On small screens, we are no longer using row direction but column */
     flex-direction: column;
   }
+  
   .bcontainer {
     width:100%;
     margin:30 px;
   }
+  
+  .ccontainer {
+  flex-direction: row;
+}
+  
 }
