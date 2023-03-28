@@ -140,3 +140,14 @@ deletePieceButton.addEventListener("click", () => {
     removePiece(row, col);
   }
 });
+
+class Game {
+  constructor() {
+    // create a 6x6x4 3D board and initialize game state
+    this.board = new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(4).fill(null)));
+    this.state = "drop";
+    this.activePlayer = 0;
+    this.activeSquare = null;
+  }
+  
+}
