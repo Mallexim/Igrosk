@@ -182,6 +182,7 @@ class Game {
  * @param {number} y - The y-coordinate of the square.
  * @returns {boolean} - True if the piece was successfully added, false otherwise.
  */
+
   addDrop(x, y) {
 
     // Check if the tower already has 4 elements
@@ -252,9 +253,9 @@ class Game {
   }
 
   /**
-   * Returns the coordinates of all squares on the board where a player can legally drop a piece.
+   * Returns an array of the coordinates of all squares on the board where a player can legally drop a piece.
    *
-   * @returns {Array} An array of tuples in the form [(x, y)].
+   * @returns {Array} An array of the form [[x1, y1], [x2, y2], ...].
    */
   getLegalDrops() {
     const legalDrops = [];
@@ -263,7 +264,7 @@ class Game {
       for (let y = 0; y < 6; y++) {
         // check if the tower at this position is not full
         if (this.getTowerHeight(x, y) < 4) {
-          legalDrops.push((x, y));
+          legalDrops.push([x, y])
         }
       }
     }
@@ -271,24 +272,27 @@ class Game {
     return legalDrops;
   }
 
-  /**
-   * Adds a click event listener to each square on the board.
-   * When a square is clicked, it calls the `addDrop` method
-   * with the `x` and `y` coordinates of the clicked square.
-   */
-  addDropEventListeners() {
-    // loop through each square and add a click event listener
-    squares.forEach((squareElement, index) => {
-      squareElement.addEventListener('click', (event) => {
-        // get the x and y coordinates of the clicked square
-        let x = Math.floor(index / 6);
-        let y = index % 6;
 
-        // call the `addDrop` method with the coordinates
+/**
+ * Adds a click event listener to each square on the board where a player can legally drop a piece.
+ * When a square is clicked, it calls the `addDrop` method with the `x` and `y` coordinates of the clicked square.
+ *
+ * @param {Array} legalDrops An array of arrays in the form [[x1, y1], [x2, y2], ...].
+ */
+addDropEventListeners(legalDrops) {
+  // loop through each square and add a click event listener if its coordinates are in the list of legal drops
+  squares.forEach((squareElement, index) => {
+    let x = Math.floor(index / 6);
+    let y = index % 6;
+
+    if (legalDrops.some((d) => d[0] === x && d[1] === y)) {
+      squareElement.addEventListener('click', (event) => {
         this.addDrop(x, y);
       });
-    });
-  }
+    }
+  });
+}
+
 
   /**
    * Removes any click event listeners from elements with class `square`.
