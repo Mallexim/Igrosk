@@ -150,30 +150,30 @@ class Game {
     this.activeSquare = null;
   }
 
-/**
- * Draws the pieces on the board based on the current game state.
- *
- * @param {number[][][]} board The current state of the game board.
- */
-drawBoard(board) {
-  // remove all existing pieces from the board
-  removeAllPieces();
+  /**
+   * Draws the pieces on the board based on the current game state.
+   *
+   * @param {number[][][]} board The current state of the game board.
+   */
+  drawBoard(board) {
+    // remove all existing pieces from the board
+    removeAllPieces();
 
-  // loop through each position on the board
-  for (let x = 0; x < 6; x++) {
-    for (let y = 0; y < 6; y++) {
-      for (let z = 0; z < 4; z++) {
-        // get the value of the current position
-        const piece = board[x][y][z];
+    // loop through each position on the board
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        for (let z = 0; z < 4; z++) {
+          // get the value of the current position
+          const piece = board[x][y][z];
 
-        // if the position is not empty, add a new piece to the board
-        if (piece !== null) {
-          placePiece(x, y, piece);
+          // if the position is not empty, add a new piece to the board
+          if (piece !== null) {
+            placePiece(x, y, piece);
+          }
         }
       }
     }
   }
-}
 
 
   /**
@@ -250,45 +250,67 @@ drawBoard(board) {
 
     return true;
   }
-  
-/**
- * Adds a click event listener to each square on the board.
- * When a square is clicked, it calls the `addDrop` method
- * with the `x` and `y` coordinates of the clicked square.
- */
-addDropEventListeners() {
-  // loop through each square and add a click event listener
-  squares.forEach((squareElement, index) => {
-    squareElement.addEventListener('click', (event) => {
-      // get the x and y coordinates of the clicked square
-      let x = Math.floor(index / 6);
-      let y = index % 6;
 
-      // call the `addDrop` method with the coordinates
-      this.addDrop(x, y);
+  /**
+   * Returns the coordinates of all squares on the board where a player can legally drop a piece.
+   *
+   * @returns {Array} An array of tuples in the form [(x, y)].
+   */
+  getLegalDrops() {
+    const legalDrops = [];
+
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        // check if the tower at this position is not full
+        if (this.getTowerHeight(x, y) < 4) {
+          legalDrops.push((x, y));
+        }
+      }
+    }
+
+    return legalDrops;
+  }
+
+  /**
+   * Adds a click event listener to each square on the board.
+   * When a square is clicked, it calls the `addDrop` method
+   * with the `x` and `y` coordinates of the clicked square.
+   */
+  addDropEventListeners() {
+    // loop through each square and add a click event listener
+    squares.forEach((squareElement, index) => {
+      squareElement.addEventListener('click', (event) => {
+        // get the x and y coordinates of the clicked square
+        let x = Math.floor(index / 6);
+        let y = index % 6;
+
+        // call the `addDrop` method with the coordinates
+        this.addDrop(x, y);
+      });
     });
-  });
-}
-  
-/**
- * Removes any click event listeners from elements with class `Square`.
- */
-removeDropEventListeners() {
-  // clone each square and replace the original with the clone
-  squares.forEach((squareElement) => {
-    const clonedSquare = squareElement.cloneNode(true);
-    squareElement.parentNode.replaceChild(clonedSquare, squareElement);
-  });
-}
+  }
 
-/**
- * Removes the click event listener from each square element in the `squares` array using the `removeEventListener` method.
- * This method is an alternative to cloning the square elements to remove the event listeners, and is typically faster for large or complex elements.
- */
-removeDropEventListeners2() {
-  squares.forEach((squareElement) => {
-    squareElement.removeEventListener('click', this.handleSquareClick);
-  });
-}
-  
+  /**
+   * Removes any click event listeners from elements with class `square`.
+   */
+  removeDropEventListeners() {
+    // clone each square and replace the original with the clone
+    squares.forEach((squareElement) => {
+      const clonedSquare = squareElement.cloneNode(true);
+      squareElement.parentNode.replaceChild(clonedSquare, squareElement);
+    });
+  }
+
+  /**
+   * Removes the click event listener from each square element in the `squares` array using the `removeEventListener` method.
+   * This method is an alternative to cloning the square elements to remove the event listeners, and is typically faster for large or complex elements.
+   */
+  removeDropEventListeners2() {
+    squares.forEach((squareElement) => {
+      squareElement.removeEventListener('click', this.handleSquareClick);
+    });
+  }
+
+
+
 }
