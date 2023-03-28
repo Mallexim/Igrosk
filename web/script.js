@@ -252,46 +252,50 @@ class Game {
     return true;
   }
 
-  /**
+/**
    * Returns an array of the coordinates of all squares on the board where a player can legally drop a piece.
    *
    * @returns {Array} An array of the form [[x1, y1], [x2, y2], ...].
    */
-  getLegalDrops() {
-    const legalDrops = [];
+getLegalDrops() {
+  const legalDrops = [];
 
-    for (let x = 0; x < 6; x++) {
-      for (let y = 0; y < 6; y++) {
-        // check if the tower at this position is not full
-        if (this.getTowerHeight(x, y) < 4) {
-          legalDrops.push([x, y])
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
+      // check if the tower at this position is not full
+      if (this.getTowerHeight(x, y) < 4) {
+        // check if the top piece of the tower is the player's color
+        if (this.board[x][y][this.getTowerHeight(x, y) - 1] === this.activePlayer) {
+          legalDrops.push([x, y]);
         }
       }
     }
-
-    return legalDrops;
   }
 
-
-/**
- * Adds a click event listener to each square on the board where a player can legally drop a piece.
- * When a square is clicked, it calls the `addDrop` method with the `x` and `y` coordinates of the clicked square.
- *
- * @param {Array} legalDrops An array of arrays in the form [[x1, y1], [x2, y2], ...].
- */
-addDropEventListeners(legalDrops) {
-  // loop through each square and add a click event listener if its coordinates are in the list of legal drops
-  squares.forEach((squareElement, index) => {
-    let x = Math.floor(index / 6);
-    let y = index % 6;
-
-    if (legalDrops.some((d) => d[0] === x && d[1] === y)) {
-      squareElement.addEventListener('click', (event) => {
-        this.addDrop(x, y);
-      });
-    }
-  });
+  return legalDrops;
 }
+
+
+
+  /**
+   * Adds a click event listener to each square on the board where a player can legally drop a piece.
+   * When a square is clicked, it calls the `addDrop` method with the `x` and `y` coordinates of the clicked square.
+   *
+   * @param {Array} legalDrops An array of arrays in the form [[x1, y1], [x2, y2], ...].
+   */
+  addDropEventListeners(legalDrops) {
+    // loop through each square and add a click event listener if its coordinates are in the list of legal drops
+    squares.forEach((squareElement, index) => {
+      let x = Math.floor(index / 6);
+      let y = index % 6;
+
+      if (legalDrops.some((d) => d[0] === x && d[1] === y)) {
+        squareElement.addEventListener('click', (event) => {
+          this.addDrop(x, y);
+        });
+      }
+    });
+  }
 
 
   /**
