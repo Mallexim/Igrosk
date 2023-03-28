@@ -7,6 +7,14 @@ let x = 0;
 let y = 0;
 let color = 0;
 
+function coordToIndex(x,y) {
+  return 6*x+y;
+}
+
+function indexToCoord(i) {
+  return [floor(i/6), i%6]; 
+}
+
 // Add click event listener to switches
 switches.forEach((switchElement) => {
   switchElement.addEventListener("click", () => {
@@ -97,8 +105,7 @@ function setBoardState() {
 outputTextarea.addEventListener("input", setBoardState);
 
 function placePiece(row, col, color) {
-  const index = row * 6 + col;
-  const square = squares[index];
+  const square = squares[coordToIndex(row,col)];
 
   // Check if the square already has 4 child elements
   if (square.children.length < 4) {
