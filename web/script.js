@@ -150,7 +150,12 @@ class Game {
     this.activeSquare = null;
   }
 
-  // Method for adding a piece to the board
+  /**
+ * Adds a piece to the specified square and updates the game state accordingly.
+ * @param {number} x - The x-coordinate of the square.
+ * @param {number} y - The y-coordinate of the square.
+ * @returns {boolean} - True if the piece was successfully added, false otherwise.
+ */
   addDrop(x, y) {
 
     // Check if the tower already has 4 elements
@@ -177,14 +182,18 @@ class Game {
   }
 
 
-  // Returns the height of the tower at the provided (x, y) position on the board
-  // The height is defined as the number of non-null elements in the tower
-  // If the tower is empty, the height is 0
+  /**
+ * Returns the height of the tower at the given position on the board.
+ *
+ * @param {number} x The x-coordinate of the position.
+ * @param {number} y The y-coordinate of the position.
+ * @returns {number} The height of the tower.
+ */
   getTowerHeight(x, y) {
+    // The height is defined as the number of non-null elements in the tower
     // Filter out null elements and return the length of the resulting array
     return this.board[x][y].filter((el) => el !== null).length;
   }
-
 
 
 
