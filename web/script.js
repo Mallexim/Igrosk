@@ -149,28 +149,43 @@ class Game {
     this.activePlayer = 0;
     this.activeSquare = null;
   }
-  
+
+  // Method for adding a piece to the board
   addDrop(x, y) {
 
-  // Check if the square or the board already has 4 child elements
-  if (this.board[x][y].filter((el) => el !== null).length < 4) {
+    // Check if the tower already has 4 elements
+    if (getTowerHeight(x, y) < 4) {
 
-    for (let z = 0; z < 4; z++) {
-      if (this.board[x][y][z] === null) {
-        this.board[x][y][z] = this.activePlayer;
-        break;
+      // Add the piece to the first empty slot in the tower
+      for (let z = 0; z < 4; z++) {
+        if (this.board[x][y][z] === null) {
+          this.board[x][y][z] = this.activePlayer;
+          break;
+        }
       }
+
+      // Update interface, the active square and game state
+      placePiece(x, y, this.activePlayer)
+      this.activeSquare = (x, y);
+      this.state = "move";
+      return true;
     }
 
-    placePiece(x, y, this.activePlayer)
-    this.activeSquare = (x,y);
-    this.state = "move";
-    return true;
+    // If the tower is full return false
+    return false;
+
   }
 
-  // If there are no null elements, return false
-  return false;
 
-}
-  
+  // Returns the height of the tower at the provided (x, y) position on the board
+  // The height is defined as the number of non-null elements in the tower
+  // If the tower is empty, the height is 0
+  getTowerHeight(x, y) {
+    // Filter out null elements and return the length of the resulting array
+    return this.board[x][y].filter((el) => el !== null).length;
+  }
+
+
+
+
 }
