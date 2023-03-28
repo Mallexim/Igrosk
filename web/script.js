@@ -223,5 +223,35 @@ drawBoard(board) {
     return this.board[x][y].filter((el) => el !== null).length;
   }
 
+  /**
+   * Removes a specified number of pieces from the top of a tower at
+   * the given position on the board.
+   *
+   * @param {number} x The x-coordinate of the position.
+   * @param {number} y The y-coordinate of the position.
+   * @param {number} n The number of pieces to remove.
+   * @returns {boolean} `true` if the pieces were removed, `false` otherwise.
+   */
+  removePiecesFromTop(x, y, n) {
+    // Get the height of the tower at the position
+    const towerHeight = this.getTowerHeight(x, y);
+
+    // Return false if the tower is empty
+    if (towerHeight === 0) {
+      return false;
+    }
+
+    // Determine the number of pieces to remove
+    const numToRemove = Math.min(n, towerHeight);
+
+    // Remove the pieces from the top of the tower
+    for (let i = towerHeight - 1; i >= towerHeight - numToRemove; i--) {
+      this.board[x][y][i] = null;
+    }
+
+    return true;
+  }
+
+
 
 }
