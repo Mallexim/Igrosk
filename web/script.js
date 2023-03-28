@@ -25,7 +25,7 @@ switches.forEach((switchElement) => {
 });
 
 // Remove all child elements from squares
-function removeAllSquares() {
+function removeAllPieces() {
   squares.forEach((square) => {
     square.innerHTML = "";
   });
@@ -150,6 +150,32 @@ class Game {
     this.activeSquare = null;
   }
 
+/**
+ * Draws the pieces on the board based on the current game state.
+ *
+ * @param {number[][][]} board The current state of the game board.
+ */
+drawBoard(board) {
+  // remove all existing pieces from the board
+  removeAllPieces();
+
+  // loop through each position on the board
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
+      for (let z = 0; z < 4; z++) {
+        // get the value of the current position
+        const piece = board[x][y][z];
+
+        // if the position is not empty, add a new piece to the board
+        if (piece !== null) {
+          placePiece(x, y, piece);
+        }
+      }
+    }
+  }
+}
+
+
   /**
  * Adds a piece to the specified square and updates the game state accordingly.
  * @param {number} x - The x-coordinate of the square.
@@ -170,7 +196,9 @@ class Game {
       }
 
       // Update interface, the active square and game state
-      placePiece(x, y, this.activePlayer)
+      // placePiece(x, y, this.activePlayer)
+      drawBoard(this.board)
+
       this.activeSquare = (x, y);
       this.state = "move";
       return true;
@@ -194,7 +222,6 @@ class Game {
     // Filter out null elements and return the length of the resulting array
     return this.board[x][y].filter((el) => el !== null).length;
   }
-
 
 
 }
