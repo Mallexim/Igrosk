@@ -5,6 +5,8 @@ const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
 let x = 0;
 let y = 0;
+const White = false;
+const Black = true;
 let color = 0;
 
 function coordToIndex(x, y) {
@@ -12,7 +14,7 @@ function coordToIndex(x, y) {
 }
 
 function indexToCoord(i) {
-  return [floor(i / 6), i % 6];
+  return [Math.floor(i / 6), i % 6];
 }
 
 // Add click event listener to switches
@@ -45,8 +47,7 @@ removeAllButton.addEventListener("click", removeAllPieces);
 function getBoardState(squares) {
   let text = "";
   squares.forEach((squareElement, index) => {
-    let x = Math.floor(index / 6);
-    let y = index % 6;
+    let [x, y] = indexToCoord(index);
     for (let i = 0; i < squareElement.children.length; i++) {
       const child = squareElement.children[i];
       if (child.classList.contains("dark")) {
@@ -118,8 +119,7 @@ function placePiece(row, col, color) {
 }
 
 function removePiece(row, col) {
-  const index = row * 6 + col;
-  const square = squares[index];
+  const square = squares[coordToIndex(row, col)];
 
   // Check if the square has any child elements
   if (square.children.length > 0) {
@@ -150,17 +150,18 @@ deletePieceButton.addEventListener("click", () => {
 
 class Game {
   constructor() {
-    // create a 6x6x4 3D board and initialize game state
-    this.board = new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(4).fill(null)));
+    // create a 6x6(x4) 3D board and initialize game state
+    this.currBoards = [new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)))];
     this.state = "drop";
     this.activePlayer = 0;
     this.activeSquare = null;
   }
 
   /**
-   * Draws the pieces on the board based on the current game state.
+   * Draws the pieces on the board based on the input game state.
    *
-   * @param {number[][][]} board The current state of the game board.
+   * @param {number[][][]} 
+   The state of the game board.
    */
   drawBoard(board) {
     // remove all existing pieces from the board
@@ -169,17 +170,18 @@ class Game {
     // loop through each position on the board
     for (let x = 0; x < 6; x++) {
       for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < 4; z++) {
-          // get the value of the current position
-          const piece = board[x][y][z];
-
-          // if the position is not empty, add a new piece to the board
-          if (piece !== null) {
-            placePiece(x, y, piece);
-          }
+        for (let z = 0; z < board[x][y].length; z++) {
+          placePiece(x, y, board[x][y][z]);
         }
       }
     }
+  }
+
+  /**
+   *Gets current state of the game board.
+   */
+  get board() {
+    return this.currBoards.slice(-1);
   }
 
 
@@ -205,7 +207,7 @@ class Game {
 
       // Update interface, the active square and game state
       // placePiece(x, y, this.activePlayer)
-      this.drawBoard(this.board)
+      // this.drawBoard(this.board)
 
       this.activeSquare = (x, y);
       this.state = "move";
@@ -280,20 +282,20 @@ class Game {
   }
 
 
-/**
- * Adds a click event listener to each square on the board where it is legal to drop a piece.
- */
-addDropEventListeners() {
-  squares.forEach((squareElement, index) => {
-    let [x, y] = indexToCoord(index);
+  /**
+   * Adds a click event listener to each square on the board where it is legal to drop a piece.
+   */
+  addDropEventListeners() {
+    squares.forEach((squareElement, index) => {
+      let [x, y] = indexToCoord(index);
 
-    if (this.isLegalDrop(x, y)) {
-      squareElement.addEventListener('click', (event) => {
-        this.addDrop(x, y);
-      });
-    }
-  });
-}
+      if (this.isLegalDrop(x, y)) {
+        squareElement.addEventListener('click', (event) => {
+          this.addDrop(x, y);
+        });
+      }
+    });
+  }
 
 
   /**
