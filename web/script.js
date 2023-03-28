@@ -150,4 +150,27 @@ class Game {
     this.activeSquare = null;
   }
   
+  addDrop(x, y) {
+
+  // Check if the square or the board already has 4 child elements
+  if (this.board[x][y].filter((el) => el !== null).length < 4) {
+
+    for (let z = 0; z < 4; z++) {
+      if (this.board[x][y][z] === null) {
+        this.board[x][y][z] = this.activePlayer;
+        break;
+      }
+    }
+
+    placePiece(x, y, this.activePlayer)
+    this.activeSquare = (x,y);
+    this.state = "move";
+    return true;
+  }
+
+  // If there are no null elements, return false
+  return false;
+
+}
+  
 }
