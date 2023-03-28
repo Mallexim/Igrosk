@@ -32,7 +32,7 @@ function removeAllPieces() {
 }
 
 const removeAllButton = document.getElementById("remove-all");
-removeAllButton.addEventListener("click", removeAllSquares);
+removeAllButton.addEventListener("click", removeAllPieces);
 
 function getBoardState(squares) {
   let text = "";
@@ -77,7 +77,7 @@ function setBoardState() {
   // split the input value at each "/" character
   const values = outputTextarea.value.trim().split("/");
   // clear the contents of all the squares
-  removeAllSquares();
+  removeAllPieces();
   squares.forEach((squareElement, index) => {
     // loop through each character in the corresponding values array
     for (let i = 0; i < values[index].length; i++) {
@@ -150,30 +150,30 @@ class Game {
     this.activeSquare = null;
   }
 
-/**
- * Draws the pieces on the board based on the current game state.
- *
- * @param {number[][][]} board The current state of the game board.
- */
-drawBoard(board) {
-  // remove all existing pieces from the board
-  removeAllPieces();
+  /**
+   * Draws the pieces on the board based on the current game state.
+   *
+   * @param {number[][][]} board The current state of the game board.
+   */
+  drawBoard(board) {
+    // remove all existing pieces from the board
+    removeAllPieces();
 
-  // loop through each position on the board
-  for (let x = 0; x < 6; x++) {
-    for (let y = 0; y < 6; y++) {
-      for (let z = 0; z < 4; z++) {
-        // get the value of the current position
-        const piece = board[x][y][z];
+    // loop through each position on the board
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        for (let z = 0; z < 4; z++) {
+          // get the value of the current position
+          const piece = board[x][y][z];
 
-        // if the position is not empty, add a new piece to the board
-        if (piece !== null) {
-          placePiece(x, y, piece);
+          // if the position is not empty, add a new piece to the board
+          if (piece !== null) {
+            placePiece(x, y, piece);
+          }
         }
       }
     }
   }
-}
 
 
   /**
@@ -185,7 +185,7 @@ drawBoard(board) {
   addDrop(x, y) {
 
     // Check if the tower already has 4 elements
-    if (getTowerHeight(x, y) < 4) {
+    if (this.getTowerHeight(x, y) < 4) {
 
       // Add the piece to the first empty slot in the tower
       for (let z = 0; z < 4; z++) {
@@ -197,7 +197,7 @@ drawBoard(board) {
 
       // Update interface, the active square and game state
       // placePiece(x, y, this.activePlayer)
-      drawBoard(this.board)
+      this.drawBoard(this.board)
 
       this.activeSquare = (x, y);
       this.state = "move";
@@ -208,7 +208,6 @@ drawBoard(board) {
     return false;
 
   }
-
 
   /**
  * Returns the height of the tower at the given position on the board.
@@ -252,6 +251,5 @@ drawBoard(board) {
     return true;
   }
 
-
-
 }
+
