@@ -269,6 +269,17 @@ addDropEventListeners() {
     });
   });
 }
+  
+/**
+ * Removes any click event listeners from elements with class `Square`.
+ */
+removeDropEventListeners() {
+  // clone each square and replace the original with the clone
+  squares.forEach((squareElement) => {
+    const clonedSquare = squareElement.cloneNode(true);
+    squareElement.parentNode.replaceChild(clonedSquare, squareElement);
+  });
+}
 
   
 }
