@@ -7,12 +7,12 @@ let x = 0;
 let y = 0;
 let color = 0;
 
-function coordToIndex(x,y) {
-  return 6*x+y;
+function coordToIndex(x, y) {
+  return 6 * x + y;
 }
 
 function indexToCoord(i) {
-  return [floor(i/6), i%6]; 
+  return [floor(i / 6), i % 6];
 }
 
 // Add click event listener to switches
@@ -105,7 +105,7 @@ function setBoardState() {
 outputTextarea.addEventListener("input", setBoardState);
 
 function placePiece(row, col, color) {
-  const square = squares[coordToIndex(row,col)];
+  const square = squares[coordToIndex(row, col)];
 
   // Check if the square already has 4 child elements
   if (square.children.length < 4) {
@@ -259,50 +259,41 @@ class Game {
     return true;
   }
 
-/**
-   * Returns an array of the coordinates of all squares on the board where a player can legally drop a piece.
+  /**
+   * Checks if a player can legally drop a piece on the specified square.
    *
-   * @returns {Array} An array of the form [[x1, y1], [x2, y2], ...].
+   * @param {number} x The x-coordinate of the square.
+   * @param {number} y The y-coordinate of the square.
+   * @returns {boolean} `true` if the drop is legal, `false` otherwise.
    */
-getLegalDrops() {
-  const legalDrops = [];
+  isLegalDrop(x, y) {
+    let legal = false;
 
-  for (let x = 0; x < 6; x++) {
-    for (let y = 0; y < 6; y++) {
-      // check if the tower at this position is not full
-      if (this.getTowerHeight(x, y) < 4) {
-        // check if the top piece of the tower is the player's color
-        if (this.board[x][y][this.getTowerHeight(x, y) - 1] === this.activePlayer) {
-          legalDrops.push([x, y]);
-        }
+    if (this.getTowerHeight(x, y) < 4) {
+      // check if the top piece of the tower is the player's color
+      if (this.board[x][y][this.getTowerHeight(x, y) - 1] === this.activePlayer) {
+        legal = true;
       }
     }
+
+    return legal;
   }
 
-  return legalDrops;
+
+/**
+ * Adds a click event listener to each square on the board where it is legal to drop a piece.
+ */
+addDropEventListeners() {
+  squares.forEach((squareElement, index) => {
+    let [x, y] = indexToCoord(index);
+
+    if (this.isLegalDrop(x, y)) {
+      squareElement.addEventListener('click', (event) => {
+        this.addDrop(x, y);
+      });
+    }
+  });
 }
-
-
-
-  /**
-   * Adds a click event listener to each square on the board where a player can legally drop a piece.
-   * When a square is clicked, it calls the `addDrop` method with the `x` and `y` coordinates of the clicked square.
-   *
-   * @param {Array} legalDrops An array of arrays in the form [[x1, y1], [x2, y2], ...].
-   */
-  addDropEventListeners(legalDrops) {
-    // loop through each square and add a click event listener if its coordinates are in the list of legal drops
-    squares.forEach((squareElement, index) => {
-      let x = Math.floor(index / 6);
-      let y = index % 6;
-
-      if (legalDrops.some((d) => d[0] === x && d[1] === y)) {
-        squareElement.addEventListener('click', (event) => {
-          this.addDrop(x, y);
-        });
-      }
-    });
-  }
 
 
   /**
