@@ -64,14 +64,14 @@ function addPieceOnClick(square) {
 }
 
 // Loop through each square element and add a click event listener
-squares.forEach((square) => {
-  square.addEventListener("click", () => {
-    // Call the addPieceOnClick function with the clicked square element as the argument
-    addPieceOnClick(square);
-    // Update the value of the outputTextarea element with the current state of the board
-    outputTextarea.value = getBoardState(squares);
-  });
-});
+// squares.forEach((square) => {
+//   square.addEventListener("click", () => {
+//     // Call the addPieceOnClick function with the clicked square element as the argument
+//     addPieceOnClick(square);
+//     // Update the value of the outputTextarea element with the current state of the board
+//     outputTextarea.value = getBoardState(squares);
+//   });
+// });
 
 function setBoardState() {
   // split the input value at each "/" character
@@ -150,30 +150,30 @@ class Game {
     this.activeSquare = null;
   }
 
-  /**
-   * Draws the pieces on the board based on the current game state.
-   *
-   * @param {number[][][]} board The current state of the game board.
-   */
-  drawBoard(board) {
-    // remove all existing pieces from the board
-    removeAllPieces();
+/**
+ * Draws the pieces on the board based on the current game state.
+ *
+ * @param {number[][][]} board The current state of the game board.
+ */
+drawBoard(board) {
+  // remove all existing pieces from the board
+  removeAllPieces();
 
-    // loop through each position on the board
-    for (let x = 0; x < 6; x++) {
-      for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < 4; z++) {
-          // get the value of the current position
-          const piece = board[x][y][z];
+  // loop through each position on the board
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
+      for (let z = 0; z < 4; z++) {
+        // get the value of the current position
+        const piece = board[x][y][z];
 
-          // if the position is not empty, add a new piece to the board
-          if (piece !== null) {
-            placePiece(x, y, piece);
-          }
+        // if the position is not empty, add a new piece to the board
+        if (piece !== null) {
+          placePiece(x, y, piece);
         }
       }
     }
   }
+}
 
 
   /**
@@ -250,6 +250,25 @@ class Game {
 
     return true;
   }
+  
+/**
+ * Adds a click event listener to each square on the board.
+ * When a square is clicked, it calls the `addDrop` method
+ * with the `x` and `y` coordinates of the clicked square.
+ */
+addDropEventListeners() {
+  // loop through each square and add a click event listener
+  squares.forEach((squareElement, index) => {
+    squareElement.addEventListener('click', (event) => {
+      // get the x and y coordinates of the clicked square
+      let x = Math.floor(index / 6);
+      let y = index % 6;
 
+      // call the `addDrop` method with the coordinates
+      this.addDrop(x, y);
+    });
+  });
 }
 
+  
+}
