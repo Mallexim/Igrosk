@@ -281,5 +281,14 @@ removeDropEventListeners() {
   });
 }
 
+/**
+ * Removes the click event listener from each square element in the `squares` array using the `removeEventListener` method.
+ * This method is an alternative to cloning the square elements to remove the event listeners, and is typically faster for large or complex elements.
+ */
+removeDropEventListeners2() {
+  squares.forEach((squareElement) => {
+    squareElement.removeEventListener('click', this.handleSquareClick);
+  });
+}
   
 }
