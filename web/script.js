@@ -280,27 +280,27 @@ class Game {
  * @param {number} n The number of pieces to move.
  * @returns {boolean} `true` if the pieces were moved, `false` otherwise.
  */
-movePieces(fromX, fromY, toX, toY, n) {
-  const towerHeight = this.getTowerHeight(fromX, fromY);
+  movePieces(fromX, fromY, toX, toY, n) {
+    const towerHeight = this.getTowerHeight(fromX, fromY);
 
-  // check if the source tower is empty
-  if (towerHeight === 0) {
-    return false;
-  }
+    // check if the source tower is empty
+    if (towerHeight === 0) {
+      return false;
+    }
 
-  // move the pieces
-  for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
-    // move the pieces from the source tower to the new tower
-    this.board[toX][toY][i] = this.board[fromX][fromY][i];
+    // move the pieces
+    for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
+      // move the pieces from the source tower to the new tower
+      this.board[toX][toY][i] = this.board[fromX][fromY][i];
+      // remove the pieces from the source tower
+      // this.board[fromX][fromY][i] = null; 
+    }
+
     // remove the pieces from the source tower
-    // this.board[fromX][fromY][i] = null; 
+    this.removePiecesFromTop(fromX, fromY, n);
+
+    return true;
   }
-
-  // remove the pieces from the source tower
-  this.removePiecesFromTop(fromX, fromY, n);
-
-  return true;
-}
 
 
   /**
@@ -370,7 +370,29 @@ movePieces(fromX, fromY, toX, toY, n) {
 
   // ! This does not work
 
+  /**
+   * Adds click event listeners to each relevant piece in the tower at the specified position,
+   * for shifting it to an adjacent square.
+   *
+   * @param {number} x The x-coordinate of the position.
+   * @param {number} y The y-coordinate of the position.
+   */
+  addShifEventtListeners(x, y) {
+    const squares = document.querySelectorAll(".square");
+    const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
+      ".child"
+    );
 
+    for (let i = this.getTowerHeight(x, y) - 1; i >= 0; i--) {
+      if (this.board[x][y][i] === this.activePlayer) {
+        pieceElements[i].addEventListener("click", (event) => {
+          console.log(`Clicked piece at ${x},${y},${i}`);
+        });
+      } else {
+        break;
+      }
+    }
+  }
 
 
 
