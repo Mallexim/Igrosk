@@ -271,6 +271,39 @@ class Game {
   }
 
   /**
+ * Moves a specified number of pieces from one tower to another.
+ *
+ * @param {number} fromX The x-coordinate of the source tower.
+ * @param {number} fromY The y-coordinate of the source tower.
+ * @param {number} toX The x-coordinate of the target tower.
+ * @param {number} toY The y-coordinate of the target tower.
+ * @param {number} n The number of pieces to move.
+ * @returns {boolean} `true` if the pieces were moved, `false` otherwise.
+ */
+movePieces(fromX, fromY, toX, toY, n) {
+  const towerHeight = this.getTowerHeight(fromX, fromY);
+
+  // check if the source tower is empty
+  if (towerHeight === 0) {
+    return false;
+  }
+
+  // move the pieces
+  for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
+    // move the pieces from the source tower to the new tower
+    this.board[toX][toY][i] = this.board[fromX][fromY][i];
+    // remove the pieces from the source tower
+    // this.board[fromX][fromY][i] = null; 
+  }
+
+  // remove the pieces from the source tower
+  this.removePiecesFromTop(fromX, fromY, n);
+
+  return true;
+}
+
+
+  /**
    * Checks if a player can legally drop a piece on the specified square.
    *
    * @param {number} x The x-coordinate of the square.
