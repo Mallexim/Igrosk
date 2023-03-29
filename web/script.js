@@ -5,8 +5,11 @@ const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
 let x = 0;
 let y = 0;
-const White = false;
-const Black = true;
+
+//Constants
+const Player = Object.freeze({White: false, Black: true});
+const Direction = Object.freeze({Up: [-1,0], Down: [1,0], Left: [-1,0], Right: [1,0]});
+const State = Object.freeze({Drop: "drop", Shift: "shift", Stop: "stop"});
 let color = 0;
 
 function coordToIndex(x, y) {
@@ -120,7 +123,7 @@ const testButton = document.querySelector(".test");
 testButton.addEventListener("click", () => {
   // console.log([x, y]);
   outputTextarea2.value = [x, y, color];
-  placePiece(x, y, color);
+  drawPiece(x, y, color);
 });
 
 const deletePieceButton = document.querySelector(".deletePiece");
@@ -135,53 +138,28 @@ deletePieceButton.addEventListener("click", () => {
   }
 });
 
-class Game {
-  constructor() {
-    // create a 6x6(x4) 3D board and initialize game state
-    this.currBoards = [new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)))];
-    this.state = "drop";
-    this.activePlayer = 0;
-    this.activeSquare = null;
-  }
-
-  /**
+/**
    * Draws the pieces on the board based on the input game state.
    *
    * @param {number[][][]} 
    The state of the game board.
    */
-  drawBoard() {
+   function drawBoard(board) {
     // remove all existing pieces from the board
     removeAllPieces();
 
     // loop through each position on the board
     for (let x = 0; x < 6; x++) {
       for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < this.board[x][y].length; z++) {
-          this.placePieceOnSquare(x, y, this.board[x][y][z]);
+        for (let z = 0; z < board[x][y].length; z++) {
+          drawPiece(x, y, board[x][y][z]);
         }
       }
     }
   }
 
-  /**
- * Places a piece of the specified color on the specified square.
- *
- * @param {number} x The x-coordinate of the square.
- * @param {number} y The y-coordinate of the square.
- * @param {number} color The color of the piece (0 for white, 1 for black).
- */
-  placePiece(x, y, color) {
-    // get the height of the tower at this position
-    const height = this.getTowerHeight(x, y);
-    // set the color of the next empty position in the tower
-    this.board[x][y][height] = color;
 
-    this.placePieceOnSquare(x, y, color)
-  }
-
-
-  placePieceOnSquare(x, y, color) {
+  function drawPiece(x, y, color) {
     // find the corresponding square element and create a new oval element
     const square = squares[coordToIndex(x, y)];
     const oval = document.createElement("div");
@@ -193,13 +171,37 @@ class Game {
     square.appendChild(oval);
   }
 
-  /**
-   *Gets current state of the game board.
-   */
-  getBoard() {
-    return this.currBoards.slice(-1);
+
+
+class Game {
+  constructor() {
+    // create a 6x6(x4) 3D board and initialize game state
+    this.activeBoard = new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)))
+    this.activeBoards = [JSON.stringify(this.activeBoard)];
+    this.activePlayer = Player.White;
+    this.log = [];
+    this.resetTurn();
   }
 
+  resetTurn() {
+    this.state = State.Drop;
+    this.activeTurn = [];
+    this.activeSquare = null;
+    this.activeBoards = [this.activeBoards[0]];
+    this.activeTurnEnd = false;
+  }
+
+  /**
+   * Checks if a player can legally drop a piece on the specified square.
+   *
+   * @param {number} x The x-coordinate of the square.
+   * @param {number} y The y-coordinate of the square.
+   * @returns {boolean} `true` if the drop is legal, `false` otherwise.
+   */
+  isLegalDrop(x, y) {
+    tower = this.activeBoard[x][y];
+    return (tower.length === 0 || (tower.length < 4 && tower.slice(-1) === this.activePlayer));
+  }
 
   /**
  * Adds a piece to the specified square and updates the game state accordingly.
@@ -210,35 +212,65 @@ class Game {
 
   addDrop(x, y) {
 
-    // Check if the tower already has 4 elements
-    if (this.getTowerHeight(x, y) < 4) {
+    if (this.isLegalDrop(x,y)) {
 
       // Update the board, the interface
-      this.placePiece(x, y, this.activePlayer);
-      this.drawBoard(this.board)
-
-      // Update the active square and game state
+      this.activeBoard[x][y].push(this.activePlayer);
       this.activeSquare = (x, y);
-      this.state = "move";
+      this.state = State.Shift;
+      this.activeTurn.push([x,y]);
+      this.activeBoards.push(JSON.stringify(this.activeBoard));
       return true;
     }
 
-    // If the tower is full return false
     return false;
 
   }
 
   /**
- * Returns the height of the tower at the given position on the board.
- *
- * @param {number} x The x-coordinate of the position.
- * @param {number} y The y-coordinate of the position.
- * @returns {number} The height of the tower.
- */
-  getTowerHeight(x, y) {
-    // The height is defined as the number of non-null elements in the tower
-    // Filter out null elements and return the length of the resulting array
-    return this.board[x][y].filter((el) => el !== null).length;
+   * Checks if a player can move n pieces in a given direction
+   * 
+   * @param {number} n - The number of pieces to be moved
+   * @param {Direction} d - The direction
+   * @returns {boolean} - true if the shift is legal, false otherwise
+   */
+  isLegalShift(n, d) {
+    var [x, y] = this.activeSquare;
+    var pile = this.activeBoard[x][y].slice(-n);
+    //Fail case: not enough pieces of the same colour
+    if (pile.length < n || pile.includes(!this.activePlayer)){
+      return false;
+    }
+    [nx, ny] = [x+d[0], y+d[1]];
+    //Fail case: moving off the board
+    if (nx<0 || nx>5 || ny<0 || ny>5) {
+      return false;
+    }
+    //Fail case: new tower is taller than old
+    if (this.activeBoard[nx][ny].length+n > this.activeBoard[x][y].length) {
+      return false;
+    }
+    //Fail case: new position has already happened this turn
+    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
+    var s = JSON.stringify(this.activeBoard);
+    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[x][y] = this.activeBoard.concat(pile);
+    if (this.activeBoards.includes(s)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Moves n pieces in direction d
+   * 
+   * @param {number} n - The number of pieces to be moved
+   * @param {Direction} d - The direction
+   * @returns {boolean} - true if the shift is legal, false otherwise
+   */
+  addShift(n, d) {
+    [x, y] =
   }
 
   /**
@@ -252,7 +284,7 @@ class Game {
    */
   removePiecesFromTop(x, y, n) {
     // Get the height of the tower at the position
-    const towerHeight = this.getTowerHeight(x, y);
+    const towerHeight = this.activeBoard[x][y].length;
 
     // Return false if the tower is empty
     if (towerHeight === 0) {
@@ -264,7 +296,7 @@ class Game {
 
     // Remove the pieces from the top of the tower
     for (let i = towerHeight - 1; i >= towerHeight - numToRemove; i--) {
-      this.board[x][y][i] = null;
+      this.activeBoard[x][y][i] = null;
     }
 
     return true;
@@ -281,7 +313,7 @@ class Game {
  * @returns {boolean} `true` if the pieces were moved, `false` otherwise.
  */
   movePieces(fromX, fromY, toX, toY, n) {
-    const towerHeight = this.getTowerHeight(fromX, fromY);
+    const towerHeight = this.activeBoard[fromX][fromY].length;
 
     // check if the source tower is empty
     if (towerHeight === 0) {
@@ -290,8 +322,8 @@ class Game {
 
     // move the pieces
     for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
-      this.board[toX][toY][i] = this.board[fromX][fromY][i];
-      // this.board[fromX][fromY][i] = null;
+      this.activeBoard[toX][toY][i] = this.activeBoard[fromX][fromY][i];
+      // this.activeBoard[fromX][fromY][i] = null;
     }
 
     // remove the pieces from the source tower
@@ -301,28 +333,6 @@ class Game {
     this.removeShiftEventListeners(fromX, fromY);
     return true;
   }
-
-
-  /**
-   * Checks if a player can legally drop a piece on the specified square.
-   *
-   * @param {number} x The x-coordinate of the square.
-   * @param {number} y The y-coordinate of the square.
-   * @returns {boolean} `true` if the drop is legal, `false` otherwise.
-   */
-  isLegalDrop(x, y) {
-    let legal = false;
-
-    if (this.getTowerHeight(x, y) < 4) {
-      // check if the top piece of the tower is the player's color
-      if (this.board[x][y][this.getTowerHeight(x, y) - 1] === this.activePlayer) {
-        legal = true;
-      }
-    }
-
-    return legal;
-  }
-
 
   /**
    * Adds a click event listener to each square on the board where it is legal to drop a piece.
@@ -377,17 +387,18 @@ class Game {
    * @param {number} x The x-coordinate of the position.
    * @param {number} y The y-coordinate of the position.
    */
-  addShiftEventtListeners(x, y) {
+  addShiftEventtListeners() {
+    var [x,y] = activeSquare;
     const squares = document.querySelectorAll(".square");
     const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
       ".child"
     );
-
-    for (let i = this.getTowerHeight(x, y) - 1; i >= 0; i--) {
-      if (this.board[x][y][i] === this.activePlayer) {
-        pieceElements[i].addEventListener("click", (event) => {
+    tower = this.activeBoard[x][y];
+    for (let i = 1; i <= tower.length; i++) {
+      if (tower[tower.length-i] === this.activePlayer) {
+        pieceElements[tower.length-i].addEventListener("click", (event) => {
           console.log(`Clicked piece at ${x},${y},${i}`);
-          this.addOrthogonalEventListeners(x, y, this.getTowerHeight(x, y)-i)
+          this.addOrthogonalEventListeners(i);
         });
       } else {
         break;
@@ -430,8 +441,8 @@ class Game {
     }
 
     // check if the target square has fewer pieces than the initial square
-    const initialHeight = this.getTowerHeight(fromX, fromY);
-    const targetHeight = this.getTowerHeight(toX, toY);
+    const initialHeight = this.activeBoard[fromX][fromY].length;
+    const targetHeight = this.activeBoard[toX][toY].length;
     if (targetHeight + n > initialHeight) {
       return false;
     }
@@ -445,18 +456,17 @@ class Game {
  * in orthogonal directions (up, down, left, right) that are legal moves for
  * the specified number of pieces.
  *
- * @param {number} x The x-coordinate of the starting square.
- * @param {number} y The y-coordinate of the starting square.
  * @param {number} n The number of pieces to move.
  */
-addOrthogonalEventListeners(x, y, n) {
+addOrthogonalEventListeners(n) {
+  var [x, y] = this.activeSquare;
   const squares = document.querySelectorAll(".square");
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
   for (const [dx, dy] of directions) {
-    if (this.isShiftLegal(x, y, x + dx, y + dy, n)) {
+    if (this.isLegalShift(n, [dx,dy])) {
       const square = squares[coordToIndex(x + dx, y + dy)];
       square.addEventListener('click', (event) => {
-        this.movePieces(x, y, x + dx, y + dy, n);
+        this.addShift(n, [dx,dy]);
         console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
       });
     }
