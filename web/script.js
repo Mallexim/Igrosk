@@ -150,15 +150,15 @@ class Game {
    * @param {number[][][]} 
    The state of the game board.
    */
-  drawBoard(board) {
+  drawBoard() {
     // remove all existing pieces from the board
     removeAllPieces();
 
     // loop through each position on the board
     for (let x = 0; x < 6; x++) {
       for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < board[x][y].length; z++) {
-          this.placePieceOnSquare(x, y, board[x][y][z]);
+        for (let z = 0; z < this.board[x][y].length; z++) {
+          this.placePieceOnSquare(x, y, this.board[x][y][z]);
         }
       }
     }
@@ -290,15 +290,15 @@ class Game {
 
     // move the pieces
     for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
-      // move the pieces from the source tower to the new tower
       this.board[toX][toY][i] = this.board[fromX][fromY][i];
-      // remove the pieces from the source tower
-      // this.board[fromX][fromY][i] = null; 
+      // this.board[fromX][fromY][i] = null;
     }
 
     // remove the pieces from the source tower
     this.removePiecesFromTop(fromX, fromY, n);
 
+    this.drawBoard();
+    this.removeShiftEventListeners(fromX, fromY);
     return true;
   }
 
@@ -344,7 +344,7 @@ class Game {
   /**
    * Removes any event listeners from elements with class `square`.
    */
-  removeDropEventListeners() {
+  removeSquareEventListeners() {
     const squares = document.querySelectorAll(".square");
     // clone each square and replace the original with the clone
     squares.forEach((squareElement) => {
@@ -387,6 +387,7 @@ class Game {
       if (this.board[x][y][i] === this.activePlayer) {
         pieceElements[i].addEventListener("click", (event) => {
           console.log(`Clicked piece at ${x},${y},${i}`);
+          this.addOrthogonalEventListeners(x, y, this.getTowerHeight(x, y)-i)
         });
       } else {
         break;
@@ -435,6 +436,7 @@ class Game {
       return false;
     }
 
+    console.log(`Moving ${n} pieces from ${fromX},${fromY} to ${toX},${toY} is legal`);
     return true;
   }
 
@@ -454,7 +456,8 @@ addOrthogonalEventListeners(x, y, n) {
     if (this.isShiftLegal(x, y, x + dx, y + dy, n)) {
       const square = squares[coordToIndex(x + dx, y + dy)];
       square.addEventListener('click', (event) => {
-        this.movePiece(x, y, x + dx, y + dy, n);
+        this.movePieces(x, y, x + dx, y + dy, n);
+        console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
       });
     }
   }
