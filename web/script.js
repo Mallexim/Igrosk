@@ -377,7 +377,7 @@ class Game {
    * @param {number} x The x-coordinate of the position.
    * @param {number} y The y-coordinate of the position.
    */
-  addShifEventtListeners(x, y) {
+  addShiftEventtListeners(x, y) {
     const squares = document.querySelectorAll(".square");
     const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
       ".child"
@@ -400,17 +400,43 @@ class Game {
  * @param {number} x The x-coordinate of the position.
  * @param {number} y The y-coordinate of the position.
  */
-removeShiftEventListeners(x, y) {
-  // select all the pieces in the tower at position (x, y)
-  const squares = document.querySelectorAll(".square");
-  const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(".child");
+  removeShiftEventListeners(x, y) {
+    // select all the pieces in the tower at position (x, y)
+    const squares = document.querySelectorAll(".square");
+    const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(".child");
 
-  // clone each piece and replace the original with the clone
-  pieceElements.forEach((pieceElement) => {
-    const clonedPiece = pieceElement.cloneNode(true);
-    pieceElement.parentNode.replaceChild(clonedPiece, pieceElement);
-  });
-}
+    // clone each piece and replace the original with the clone
+    pieceElements.forEach((pieceElement) => {
+      const clonedPiece = pieceElement.cloneNode(true);
+      pieceElement.parentNode.replaceChild(clonedPiece, pieceElement);
+    });
+  }
+
+  /**
+   * Returns true if it is legal to shift a specified number of pieces from the given square up, down, left, or right, and the target square would not have more pieces than the original square.
+   *
+   * @param {number} fromX The x-coordinate of the initial square.
+   * @param {number} fromY The y-coordinate of the initial square.
+   * @param {number} toX The x-coordinate of the target square.
+   * @param {number} toY The y-coordinate of the target square.
+   * @param {number} n The number of pieces to move.
+   * @returns {boolean} `true` if it is legal to shift a specified number of pieces from the given square, `false` otherwise.
+   */
+  isShiftLegal(fromX, fromY, toX, toY, n) {
+    // check if the target square is on the board
+    if (toX < 0 || toX >= 6 || toY < 0 || toY >= 6) {
+      return false;
+    }
+
+    // check if the target square has fewer pieces than the initial square
+    const initialHeight = this.getTowerHeight(fromX, fromY);
+    const targetHeight = this.getTowerHeight(toX, toY);
+    if (targetHeight + n > initialHeight) {
+      return false;
+    }
+
+    return true;
+  }
 
 
 
