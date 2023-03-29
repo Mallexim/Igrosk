@@ -295,6 +295,7 @@ class Game {
    * Adds a click event listener to each square on the board where it is legal to drop a piece.
    */
   addDropEventListeners() {
+    const squares = document.querySelectorAll(".square");
     squares.forEach((squareElement, index) => {
       let [x, y] = indexToCoord(index);
 
@@ -308,9 +309,10 @@ class Game {
 
 
   /**
-   * Removes any click event listeners from elements with class `square`.
+   * Removes any event listeners from elements with class `square`.
    */
   removeDropEventListeners() {
+    const squares = document.querySelectorAll(".square");
     // clone each square and replace the original with the clone
     squares.forEach((squareElement) => {
       const clonedSquare = squareElement.cloneNode(true);
@@ -322,11 +324,18 @@ class Game {
    * Removes the click event listener from each square element in the `squares` array using the `removeEventListener` method.
    * This method is an alternative to cloning the square elements to remove the event listeners, and is typically faster for large or complex elements.
    */
-  removeDropEventListeners2() {
-    squares.forEach((squareElement) => {
-      squareElement.removeEventListener('click', this.handleSquareClick);
-    });
-  }
+  // removeDropEventListeners2() {
+  //   const squares = document.querySelectorAll(".square");
+  //   squares.forEach((squareElement, index) => {
+  //     let [x, y] = indexToCoord(index);
+  //       squareElement.removeEventListener(
+  //         "click",
+  //         this.handleSquareClick.bind(this, event, x, y)
+  //       );
+  //   });
+  // }
+
+  // ! This does not work
 
 
 
