@@ -105,19 +105,6 @@ function setBoardState() {
 
 outputTextarea.addEventListener("input", setBoardState);
 
-function placePiece(row, col, color) {
-  const square = squares[coordToIndex(row, col)];
-
-  // Check if the square already has 4 child elements
-  if (square.children.length < 4) {
-    // Create a new oval element and add classes for styling
-    let oval = document.createElement("div");
-    oval.classList.add("child", "oval", color ? "dark" : "light");
-    // Add the piece to the the square
-    square.appendChild(oval);
-  }
-}
-
 function removePiece(row, col) {
   const square = squares[coordToIndex(row, col)];
 
@@ -171,16 +158,45 @@ class Game {
     for (let x = 0; x < 6; x++) {
       for (let y = 0; y < 6; y++) {
         for (let z = 0; z < board[x][y].length; z++) {
-          placePiece(x, y, board[x][y][z]);
+          this.placePieceOnSquare(x, y, board[x][y][z]);
         }
       }
     }
   }
 
   /**
+ * Places a piece of the specified color on the specified square.
+ *
+ * @param {number} x The x-coordinate of the square.
+ * @param {number} y The y-coordinate of the square.
+ * @param {number} color The color of the piece (0 for white, 1 for black).
+ */
+  placePiece(x, y, color) {
+    // get the height of the tower at this position
+    const height = this.getTowerHeight(x, y);
+    // set the color of the next empty position in the tower
+    this.board[x][y][height] = color;
+
+    this.placePieceOnSquare(x, y, color)
+  }
+
+
+  placePieceOnSquare(x, y, color) {
+    // find the corresponding square element and create a new oval element
+    const square = squares[coordToIndex(x, y)];
+    const oval = document.createElement("div");
+
+    // add classes to the oval element for styling
+    oval.classList.add("child", "oval", color ? "dark" : "light");
+
+    // add the oval element to the square element
+    square.appendChild(oval);
+  }
+
+  /**
    *Gets current state of the game board.
    */
-  get board() {
+  getBoard() {
     return this.currBoards.slice(-1);
   }
 
@@ -197,18 +213,11 @@ class Game {
     // Check if the tower already has 4 elements
     if (this.getTowerHeight(x, y) < 4) {
 
-      // Add the piece to the first empty slot in the tower
-      for (let z = 0; z < 4; z++) {
-        if (this.board[x][y][z] === null) {
-          this.board[x][y][z] = this.activePlayer;
-          break;
-        }
-      }
+      // Update the board, the interface
+      this.placePiece(x, y, this.activePlayer);
+      this.drawBoard(this.board)
 
-      // Update interface, the active square and game state
-      // placePiece(x, y, this.activePlayer)
-      // this.drawBoard(this.board)
-
+      // Update the active square and game state
       this.activeSquare = (x, y);
       this.state = "move";
       return true;
@@ -318,6 +327,8 @@ class Game {
       squareElement.removeEventListener('click', this.handleSquareClick);
     });
   }
+
+
 
 
 
