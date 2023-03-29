@@ -394,6 +394,24 @@ class Game {
     }
   }
 
+  /**
+ * Removes any click event listeners from the pieces in the tower at the given position.
+ *
+ * @param {number} x The x-coordinate of the position.
+ * @param {number} y The y-coordinate of the position.
+ */
+removeShiftEventListeners(x, y) {
+  // select all the pieces in the tower at position (x, y)
+  const squares = document.querySelectorAll(".square");
+  const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(".child");
+
+  // clone each piece and replace the original with the clone
+  pieceElements.forEach((pieceElement) => {
+    const clonedPiece = pieceElement.cloneNode(true);
+    pieceElement.parentNode.replaceChild(clonedPiece, pieceElement);
+  });
+}
+
 
 
 }
