@@ -438,6 +438,27 @@ class Game {
     return true;
   }
 
+/**
+ * Adds click event listeners to all squares adjacent to the specified square
+ * in orthogonal directions (up, down, left, right) that are legal moves for
+ * the specified number of pieces.
+ *
+ * @param {number} x The x-coordinate of the starting square.
+ * @param {number} y The y-coordinate of the starting square.
+ * @param {number} n The number of pieces to move.
+ */
+addOrthogonalEventListeners(x, y, n) {
+  const squares = document.querySelectorAll(".square");
+  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+  for (const [dx, dy] of directions) {
+    if (this.isShiftLegal(x, y, x + dx, y + dy, n)) {
+      const square = squares[coordToIndex(x + dx, y + dy)];
+      square.addEventListener('click', (event) => {
+        this.movePiece(x, y, x + dx, y + dy, n);
+      });
+    }
+  }
+}
 
 
 }
