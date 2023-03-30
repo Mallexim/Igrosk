@@ -232,7 +232,7 @@ function addShiftEventtListeners(game) {
   const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
     ".child"
   );
-  tower = game.activeBoard[x][y];
+  var tower = game.activeBoard[x][y];
   for (let i = 1; i <= tower.length; i++) {
     if (tower[tower.length-i] === game.activePlayer) {
       pieceElements[tower.length-i].addEventListener("click", (event) => {
@@ -291,6 +291,21 @@ function addClickEventListeners(game) {
 }
 
 /**
+function deactivateEndTurnButton() {
+  endTurnButton = document.getElementById('endturn');
+  buttonCopy = endTurnButton.cloneNode(true);
+  endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
+}
+
+function activateEndTurnButton(game) {
+  endTurnButton = document.getElementById('endturn');
+  endTurnButton.addEventListener('click', () => {
+
+  })
+}
+*/
+
+/**
  * Class for the inner logic of the game
  */
 class Game {
@@ -323,7 +338,7 @@ class Game {
    * @returns {boolean} `true` if the drop is legal, `false` otherwise.
    */
   isLegalDrop(x, y) {
-    tower = this.activeBoard[x][y];
+    var tower = this.activeBoard[x][y];
     return (tower.length === 0 || (tower.length < 4 && tower.slice(-1)[0] === this.activePlayer));
   }
 
@@ -398,7 +413,7 @@ class Game {
       this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
       //If there was no piece left at the previous square,
       //the turn will be forced to end after this shift
-      tower = this.activeBoard[x][y];
+      var tower = this.activeBoard[x][y];
       if (tower.length === 0 || tower[tower.length-1] === !this.activePlayer) {
         this.state = State.Stop;
       }
