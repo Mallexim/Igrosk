@@ -39,7 +39,7 @@ switches.forEach((switchElement) => {
 
 // Remove all child elements from squares
 function removeAllPieces() {
-  squares.forEach((square) => {
+  document.querySelectorAll(".square").forEach((square) => {
     square.innerHTML = "";
   });
 }
@@ -149,8 +149,8 @@ function drawBoard(board) {
   removeAllPieces();
 
   // loop through each position on the board
-  for (let x = 0; x < 6; x++) {
-    for (let y = 0; y < 6; y++) {
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board[x].length; y++) {
       for (let z = 0; z < board[x][y].length; z++) {
         drawPiece(x, y, board[x][y][z]);
       }
@@ -161,7 +161,7 @@ function drawBoard(board) {
 
 function drawPiece(x, y, color) {
   // find the corresponding square element and create a new oval element
-  const square = squares[coordToIndex(x, y)];
+  const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
   const oval = document.createElement("div");
 
   // add classes to the oval element for styling
@@ -214,7 +214,8 @@ function addDropEventListeners(game) {
       squareElement.addEventListener('click', (event) => {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
-        addClickEventtListeners(game);
+        resetEventListeners(game);
+        activateEndTurnButton(game);
       });
     }
   });
@@ -237,7 +238,9 @@ function addShiftEventtListeners(game) {
     if (tower[tower.length-i] === game.activePlayer) {
       pieceElements[tower.length-i].addEventListener("click", (event) => {
         console.log(`Clicked piece at ${x},${y},${i}`);
+        removeSquareEventListeners();
         addOrthogonalEventListeners(game, i);
+        addShiftEventtListeners(game);
       });
     } else {
       break;
@@ -254,7 +257,6 @@ function addShiftEventtListeners(game) {
  * @param {number} n - The number of pieces to move.
  */
 function addOrthogonalEventListeners(game, n) {
-  removeSquareEventListeners();
   var [x, y] = game.activeSquare;
   const squares = document.querySelectorAll(".square");
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
@@ -266,7 +268,7 @@ function addOrthogonalEventListeners(game, n) {
         game.addShift(n, [dx,dy]);
         drawBoard(game.activeBoard);
         console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
-        addClickEventListeners(game);
+        resetEventListeners(game);
       });
     }
   }
@@ -277,7 +279,8 @@ function addOrthogonalEventListeners(game, n) {
  * 
  * @param {Game} game - The game object
  */
-function addClickEventListeners(game) {
+function resetEventListeners(game) {
+  removeSquareEventListeners();
   switch (game.state) {
     case State.Drop:
       addDropEventListeners(game);
@@ -290,7 +293,7 @@ function addClickEventListeners(game) {
   }
 }
 
-/**
+
 function deactivateEndTurnButton() {
   endTurnButton = document.getElementById('endturn');
   buttonCopy = endTurnButton.cloneNode(true);
@@ -300,10 +303,14 @@ function deactivateEndTurnButton() {
 function activateEndTurnButton(game) {
   endTurnButton = document.getElementById('endturn');
   endTurnButton.addEventListener('click', () => {
-
+    game.endTurn();
+    removeShiftEventListeners();
+    removeSquareEventListeners();
+    addClickEventListeners();
+    deactivateEndTurnButton();
   })
 }
-*/
+
 
 /**
  * Class for the inner logic of the game
@@ -354,7 +361,7 @@ class Game {
 
       // Update the board, the interface
       this.activeBoard[x][y].push(this.activePlayer);
-      this.activeSquare = (x, y);
+      this.activeSquare = [x, y];
       this.state = State.Shift;
       this.activeTurn.push([x,y]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
@@ -410,7 +417,7 @@ class Game {
   addShift(n, d) {
     if (isLegalShift(n, d)) {
       var [x, y] = this.activeSquare;
-      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
       //If there was no piece left at the previous square,
       //the turn will be forced to end after this shift
       var tower = this.activeBoard[x][y];
@@ -418,7 +425,7 @@ class Game {
         this.state = State.Stop;
       }
       [x, y] = [x+d[0], y+d[1]];
-      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      this.activeBoard[x][y] = this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
       this.activeTurn.push([x, y]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
