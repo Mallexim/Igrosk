@@ -5,12 +5,12 @@ const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
 let x = 0;
 let y = 0;
+let color = 0;
 
 //Constants
 const Player = Object.freeze({White: false, Black: true});
 const Direction = Object.freeze({Up: [-1,0], Down: [1,0], Left: [-1,0], Right: [1,0]});
 const State = Object.freeze({Drop: "drop", Shift: "shift", Stop: "stop"});
-let color = 0;
 
 function coordToIndex(x, y) {
   return 6 * x + y;
@@ -174,7 +174,7 @@ function drawPiece(x, y, color) {
 /**
  * Removes any event listeners from elements with class `square`.
  */
-function removeDropEventListeners() {
+function removeSquareEventListeners() {
   const squares = document.querySelectorAll(".square");
   // clone each square and replace the original with the clone
   squares.forEach((squareElement) => {
@@ -214,7 +214,7 @@ function addDropEventListeners(game) {
       squareElement.addEventListener('click', (event) => {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
-        addShiftEventtListeners(game);
+        addClickEventtListeners(game);
       });
     }
   });
@@ -254,6 +254,7 @@ function addShiftEventtListeners(game) {
  * @param {number} n - The number of pieces to move.
  */
 function addOrthogonalEventListeners(game, n) {
+  removeSquareEventListeners();
   var [x, y] = game.activeSquare;
   const squares = document.querySelectorAll(".square");
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
@@ -265,14 +266,29 @@ function addOrthogonalEventListeners(game, n) {
         game.addShift(n, [dx,dy]);
         drawBoard(game.activeBoard);
         console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
-        if (game.state === State.Shift) {
-          addShiftEventtListeners(game);
-        }
+        addClickEventListeners(game);
       });
     }
   }
 }
 
+/**
+ * Adds click event listeners based on the game state
+ * 
+ * @param {Game} game - The game object
+ */
+function addClickEventListeners(game) {
+  switch (game.state) {
+    case State.Drop:
+      addDropEventListeners(game);
+      break;
+    case State.Shift:
+      addShiftEventtListeners(game);
+      break;
+    case State.Stop:
+      break;
+  }
+}
 
 /**
  * Class for the inner logic of the game
