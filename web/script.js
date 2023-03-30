@@ -5,8 +5,11 @@ const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
 let x = 0;
 let y = 0;
-const White = false;
-const Black = true;
+
+//Constants
+const Player = Object.freeze({White: false, Black: true});
+const Direction = Object.freeze({Up: [-1,0], Down: [1,0], Left: [-1,0], Right: [1,0]});
+const State = Object.freeze({Drop: "drop", Shift: "shift", Stop: "stop"});
 let color = 0;
 
 function coordToIndex(x, y) {
@@ -120,7 +123,7 @@ const testButton = document.querySelector(".test");
 testButton.addEventListener("click", () => {
   // console.log([x, y]);
   outputTextarea2.value = [x, y, color];
-  placePiece(x, y, color);
+  drawPiece(x, y, color);
 });
 
 const deletePieceButton = document.querySelector(".deletePiece");
@@ -135,173 +138,166 @@ deletePieceButton.addEventListener("click", () => {
   }
 });
 
-class Game {
-  constructor() {
-    // create a 6x6(x4) 3D board and initialize game state
-    this.currBoards = [new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)))];
-    this.state = "drop";
-    this.activePlayer = 0;
-    this.activeSquare = null;
-  }
+/**
+ * Draws the pieces on the board based on the input game state.
+ *
+ * @param {number[][][]} 
+ The state of the game board.
+  */
+function drawBoard(board) {
+  // remove all existing pieces from the board
+  removeAllPieces();
 
-  /**
-   * Draws the pieces on the board based on the input game state.
-   *
-   * @param {number[][][]} 
-   The state of the game board.
-   */
-  drawBoard() {
-    // remove all existing pieces from the board
-    removeAllPieces();
-
-    // loop through each position on the board
-    for (let x = 0; x < 6; x++) {
-      for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < this.board[x][y].length; z++) {
-          this.placePieceOnSquare(x, y, this.board[x][y][z]);
-        }
+  // loop through each position on the board
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
+      for (let z = 0; z < board[x][y].length; z++) {
+        drawPiece(x, y, board[x][y][z]);
       }
     }
   }
+}
 
-  /**
- * Places a piece of the specified color on the specified square.
+
+function drawPiece(x, y, color) {
+  // find the corresponding square element and create a new oval element
+  const square = squares[coordToIndex(x, y)];
+  const oval = document.createElement("div");
+
+  // add classes to the oval element for styling
+  oval.classList.add("child", "oval", color ? "dark" : "light");
+
+  // add the oval element to the square element
+  square.appendChild(oval);
+}
+
+/**
+ * Removes any event listeners from elements with class `square`.
+ */
+function removeDropEventListeners() {
+  const squares = document.querySelectorAll(".square");
+  // clone each square and replace the original with the clone
+  squares.forEach((squareElement) => {
+    const clonedSquare = squareElement.cloneNode(true);
+    squareElement.parentNode.replaceChild(clonedSquare, squareElement);
+  });
+}
+
+/**
+ * Removes any click event listeners from the pieces in the tower at the given position.
  *
- * @param {number} x The x-coordinate of the square.
- * @param {number} y The y-coordinate of the square.
- * @param {number} color The color of the piece (0 for white, 1 for black).
+ * @param {Game} game - The game object
  */
-  placePiece(x, y, color) {
-    // get the height of the tower at this position
-    const height = this.getTowerHeight(x, y);
-    // set the color of the next empty position in the tower
-    this.board[x][y][height] = color;
+function removeShiftEventListeners(x, y) {
+  // select all the pieces in the tower at position (x, y)
+  const squares = document.querySelectorAll(".square");
+  const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(".child");
 
-    this.placePieceOnSquare(x, y, color)
-  }
+  // clone each piece and replace the original with the clone
+  pieceElements.forEach((pieceElement) => {
+    const clonedPiece = pieceElement.cloneNode(true);
+    pieceElement.parentNode.replaceChild(clonedPiece, pieceElement);
+  });
+}
 
-
-  placePieceOnSquare(x, y, color) {
-    // find the corresponding square element and create a new oval element
-    const square = squares[coordToIndex(x, y)];
-    const oval = document.createElement("div");
-
-    // add classes to the oval element for styling
-    oval.classList.add("child", "oval", color ? "dark" : "light");
-
-    // add the oval element to the square element
-    square.appendChild(oval);
-  }
-
-  /**
-   *Gets current state of the game board.
-   */
-  getBoard() {
-    return this.currBoards.slice(-1);
-  }
-
-
-  /**
- * Adds a piece to the specified square and updates the game state accordingly.
- * @param {number} x - The x-coordinate of the square.
- * @param {number} y - The y-coordinate of the square.
- * @returns {boolean} - True if the piece was successfully added, false otherwise.
+/**
+ * Adds a click event listener to each square on the board where it is legal to drop a piece.
+ * 
+ * @param {Game} game - The game object
  */
+function addDropEventListeners(game) {
+  const squares = document.querySelectorAll(".square");
+  squares.forEach((squareElement, index) => {
+    let [x, y] = indexToCoord(index);
 
-  addDrop(x, y) {
-
-    // Check if the tower already has 4 elements
-    if (this.getTowerHeight(x, y) < 4) {
-
-      // Update the board, the interface
-      this.placePiece(x, y, this.activePlayer);
-      this.drawBoard(this.board)
-
-      // Update the active square and game state
-      this.activeSquare = (x, y);
-      this.state = "move";
-      return true;
+    if (game.isLegalDrop(x, y)) {
+      squareElement.addEventListener('click', (event) => {
+        game.addDrop(x, y);
+        drawBoard(game.activeBoard);
+        addShiftEventtListeners(game);
+      });
     }
+  });
+}
 
-    // If the tower is full return false
-    return false;
-
-  }
-
-  /**
- * Returns the height of the tower at the given position on the board.
- *
- * @param {number} x The x-coordinate of the position.
- * @param {number} y The y-coordinate of the position.
- * @returns {number} The height of the tower.
- */
-  getTowerHeight(x, y) {
-    // The height is defined as the number of non-null elements in the tower
-    // Filter out null elements and return the length of the resulting array
-    return this.board[x][y].filter((el) => el !== null).length;
-  }
-
-  /**
-   * Removes a specified number of pieces from the top of a tower at
-   * the given position on the board.
+/**
+   * Adds click event listeners to each relevant piece in the tower at the specified position,
+   * for shifting it to an adjacent square.
    *
-   * @param {number} x The x-coordinate of the position.
-   * @param {number} y The y-coordinate of the position.
-   * @param {number} n The number of pieces to remove.
-   * @returns {boolean} `true` if the pieces were removed, `false` otherwise.
+   * @param {Game} game - The game object
    */
-  removePiecesFromTop(x, y, n) {
-    // Get the height of the tower at the position
-    const towerHeight = this.getTowerHeight(x, y);
-
-    // Return false if the tower is empty
-    if (towerHeight === 0) {
-      return false;
+function addShiftEventtListeners(game) {
+  var [x,y] = game.activeSquare;
+  const squares = document.querySelectorAll(".square");
+  const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
+    ".child"
+  );
+  tower = game.activeBoard[x][y];
+  for (let i = 1; i <= tower.length; i++) {
+    if (tower[tower.length-i] === game.activePlayer) {
+      pieceElements[tower.length-i].addEventListener("click", (event) => {
+        console.log(`Clicked piece at ${x},${y},${i}`);
+        addOrthogonalEventListeners(game, i);
+      });
+    } else {
+      break;
     }
+  }
+}
 
-    // Determine the number of pieces to remove
-    const numToRemove = Math.min(n, towerHeight);
-
-    // Remove the pieces from the top of the tower
-    for (let i = towerHeight - 1; i >= towerHeight - numToRemove; i--) {
-      this.board[x][y][i] = null;
+/**
+ * Adds click event listeners to all squares adjacent to the specified square
+ * in orthogonal directions (up, down, left, right) that are legal moves for
+ * the specified number of pieces.
+ *
+ * @param {Game} game - The game object
+ * @param {number} n - The number of pieces to move.
+ */
+function addOrthogonalEventListeners(game, n) {
+  var [x, y] = game.activeSquare;
+  const squares = document.querySelectorAll(".square");
+  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+  for (const [dx, dy] of directions) {
+    if (game.isLegalShift(n, [dx,dy])) {
+      const square = squares[coordToIndex(x + dx, y + dy)];
+      square.addEventListener('click', (event) => {
+        removeShiftEventListeners(x, y);
+        game.addShift(n, [dx,dy]);
+        drawBoard(game.activeBoard);
+        console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
+        if (game.state === State.Shift) {
+          addShiftEventtListeners(game);
+        }
+      });
     }
+  }
+}
 
-    return true;
+
+/**
+ * Class for the inner logic of the game
+ */
+class Game {
+  
+  constructor() {
+    this.activeBoard = new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)));
+    this.activeBoards = [JSON.stringify(this.activeBoard)];
+    this.activePlayer = Player.White;
+    this.log = [];
+    this.resetTurn();
   }
 
   /**
- * Moves a specified number of pieces from one tower to another.
- *
- * @param {number} fromX The x-coordinate of the source tower.
- * @param {number} fromY The y-coordinate of the source tower.
- * @param {number} toX The x-coordinate of the target tower.
- * @param {number} toY The y-coordinate of the target tower.
- * @param {number} n The number of pieces to move.
- * @returns {boolean} `true` if the pieces were moved, `false` otherwise.
- */
-  movePieces(fromX, fromY, toX, toY, n) {
-    const towerHeight = this.getTowerHeight(fromX, fromY);
-
-    // check if the source tower is empty
-    if (towerHeight === 0) {
-      return false;
-    }
-
-    // move the pieces
-    for (let i = towerHeight - 1; i >= towerHeight - n; i--) {
-      this.board[toX][toY][i] = this.board[fromX][fromY][i];
-      // this.board[fromX][fromY][i] = null;
-    }
-
-    // remove the pieces from the source tower
-    this.removePiecesFromTop(fromX, fromY, n);
-
-    this.drawBoard();
-    this.removeShiftEventListeners(fromX, fromY);
-    return true;
+   * Resets the turn and updates all relevant variables
+   */
+  resetTurn() {
+    this.state = State.Drop;
+    this.activeTurn = [];
+    this.activeSquare = null;
+    this.activeBoards = [this.activeBoards[0]];
+    this.activeTurnEnd = false;
+    this.activeBoard = JSON.parse(this.activeBoards[0]);
   }
-
 
   /**
    * Checks if a player can legally drop a piece on the specified square.
@@ -311,157 +307,151 @@ class Game {
    * @returns {boolean} `true` if the drop is legal, `false` otherwise.
    */
   isLegalDrop(x, y) {
-    let legal = false;
-
-    if (this.getTowerHeight(x, y) < 4) {
-      // check if the top piece of the tower is the player's color
-      if (this.board[x][y][this.getTowerHeight(x, y) - 1] === this.activePlayer) {
-        legal = true;
-      }
-    }
-
-    return legal;
-  }
-
-
-  /**
-   * Adds a click event listener to each square on the board where it is legal to drop a piece.
-   */
-  addDropEventListeners() {
-    const squares = document.querySelectorAll(".square");
-    squares.forEach((squareElement, index) => {
-      let [x, y] = indexToCoord(index);
-
-      if (this.isLegalDrop(x, y)) {
-        squareElement.addEventListener('click', (event) => {
-          this.addDrop(x, y);
-        });
-      }
-    });
-  }
-
-
-  /**
-   * Removes any event listeners from elements with class `square`.
-   */
-  removeSquareEventListeners() {
-    const squares = document.querySelectorAll(".square");
-    // clone each square and replace the original with the clone
-    squares.forEach((squareElement) => {
-      const clonedSquare = squareElement.cloneNode(true);
-      squareElement.parentNode.replaceChild(clonedSquare, squareElement);
-    });
+    tower = this.activeBoard[x][y];
+    return (tower.length === 0 || (tower.length < 4 && tower.slice(-1)[0] === this.activePlayer));
   }
 
   /**
-   * Removes the click event listener from each square element in the `squares` array using the `removeEventListener` method.
-   * This method is an alternative to cloning the square elements to remove the event listeners, and is typically faster for large or complex elements.
-   */
-  // removeDropEventListeners2() {
-  //   const squares = document.querySelectorAll(".square");
-  //   squares.forEach((squareElement, index) => {
-  //     let [x, y] = indexToCoord(index);
-  //       squareElement.removeEventListener(
-  //         "click",
-  //         this.handleSquareClick.bind(this, event, x, y)
-  //       );
-  //   });
-  // }
-
-  // ! This does not work
-
-  /**
-   * Adds click event listeners to each relevant piece in the tower at the specified position,
-   * for shifting it to an adjacent square.
-   *
-   * @param {number} x The x-coordinate of the position.
-   * @param {number} y The y-coordinate of the position.
-   */
-  addShiftEventtListeners(x, y) {
-    const squares = document.querySelectorAll(".square");
-    const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
-      ".child"
-    );
-
-    for (let i = this.getTowerHeight(x, y) - 1; i >= 0; i--) {
-      if (this.board[x][y][i] === this.activePlayer) {
-        pieceElements[i].addEventListener("click", (event) => {
-          console.log(`Clicked piece at ${x},${y},${i}`);
-          this.addOrthogonalEventListeners(x, y, this.getTowerHeight(x, y)-i)
-        });
-      } else {
-        break;
-      }
-    }
-  }
-
-  /**
- * Removes any click event listeners from the pieces in the tower at the given position.
- *
- * @param {number} x The x-coordinate of the position.
- * @param {number} y The y-coordinate of the position.
+ * Adds a piece to the specified square and updates the game state accordingly.
+ * @param {number} x - The x-coordinate of the square.
+ * @param {number} y - The y-coordinate of the square.
+ * @returns {boolean} - True if the piece was successfully added, false otherwise.
  */
-  removeShiftEventListeners(x, y) {
-    // select all the pieces in the tower at position (x, y)
-    const squares = document.querySelectorAll(".square");
-    const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(".child");
+  addDrop(x, y) {
 
-    // clone each piece and replace the original with the clone
-    pieceElements.forEach((pieceElement) => {
-      const clonedPiece = pieceElement.cloneNode(true);
-      pieceElement.parentNode.replaceChild(clonedPiece, pieceElement);
-    });
+    if (this.isLegalDrop(x,y)) {
+
+      // Update the board, the interface
+      this.activeBoard[x][y].push(this.activePlayer);
+      this.activeSquare = (x, y);
+      this.state = State.Shift;
+      this.activeTurn.push([x,y]);
+      this.activeBoards.push(JSON.stringify(this.activeBoard));
+      return true;
+    }
+
+    return false;
+
   }
 
   /**
-   * Returns true if it is legal to shift a specified number of pieces from the given square up, down, left, or right, and the target square would not have more pieces than the original square.
-   *
-   * @param {number} fromX The x-coordinate of the initial square.
-   * @param {number} fromY The y-coordinate of the initial square.
-   * @param {number} toX The x-coordinate of the target square.
-   * @param {number} toY The y-coordinate of the target square.
-   * @param {number} n The number of pieces to move.
-   * @returns {boolean} `true` if it is legal to shift a specified number of pieces from the given square, `false` otherwise.
+   * Checks if a player can move n pieces in a given direction
+   * 
+   * @param {number} n - The number of pieces to be moved
+   * @param {Direction} d - The direction
+   * @returns {boolean} - true if the shift is legal, false otherwise
    */
-  isShiftLegal(fromX, fromY, toX, toY, n) {
-    // check if the target square is on the board
-    if (toX < 0 || toX >= 6 || toY < 0 || toY >= 6) {
+  isLegalShift(n, d) {
+    var [x, y] = this.activeSquare;
+    var pile = this.activeBoard[x][y].slice(-n);
+    //Fail case: not enough pieces of the same colour
+    if (pile.length < n || pile.includes(!this.activePlayer)){
       return false;
     }
-
-    // check if the target square has fewer pieces than the initial square
-    const initialHeight = this.getTowerHeight(fromX, fromY);
-    const targetHeight = this.getTowerHeight(toX, toY);
-    if (targetHeight + n > initialHeight) {
+    var [nx, ny] = [x+d[0], y+d[1]];
+    //Fail case: moving off the board
+    if (nx<0 || nx>5 || ny<0 || ny>5) {
       return false;
     }
-
-    console.log(`Moving ${n} pieces from ${fromX},${fromY} to ${toX},${toY} is legal`);
+    //Fail case: new tower is taller than old
+    if (this.activeBoard[nx][ny].length+n > this.activeBoard[x][y].length) {
+      return false;
+    }
+    //Fail case: new position has already happened this turn
+    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
+    var s = JSON.stringify(this.activeBoard);
+    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[x][y] = this.activeBoard.concat(pile);
+    if (this.activeBoards.includes(s)) {
+      return false;
+    }
     return true;
   }
 
-/**
- * Adds click event listeners to all squares adjacent to the specified square
- * in orthogonal directions (up, down, left, right) that are legal moves for
- * the specified number of pieces.
- *
- * @param {number} x The x-coordinate of the starting square.
- * @param {number} y The y-coordinate of the starting square.
- * @param {number} n The number of pieces to move.
- */
-addOrthogonalEventListeners(x, y, n) {
-  const squares = document.querySelectorAll(".square");
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-  for (const [dx, dy] of directions) {
-    if (this.isShiftLegal(x, y, x + dx, y + dy, n)) {
-      const square = squares[coordToIndex(x + dx, y + dy)];
-      square.addEventListener('click', (event) => {
-        this.movePieces(x, y, x + dx, y + dy, n);
-        console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
-      });
+  /**
+   * Moves n pieces in direction d and updates the game accordingly
+   * 
+   * @param {number} n - The number of pieces to be moved
+   * @param {Direction} d - The direction
+   * @returns {boolean} - true if the shift is legal, false otherwise
+   */
+  addShift(n, d) {
+    if (isLegalShift(n, d)) {
+      var [x, y] = this.activeSquare;
+      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      //If there was no piece left at the previous square,
+      //the turn will be forced to end after this shift
+      tower = this.activeBoard[x][y];
+      if (tower.length === 0 || tower[tower.length-1] === !this.activePlayer) {
+        this.state = State.Stop;
+      }
+      [x, y] = [x+d[0], y+d[1]];
+      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      this.activeSquare = [x, y];
+      this.activeTurn.push([x, y]);
+      this.activeBoards.push(JSON.stringify(this.activeBoard));
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Undoes a move (drop or shift)
+   */
+  undoMove() {
+    if (this.activeTurn.length === 1) {
+      //If there was only one move (drop), just reset the turn
+      this.resetTurn();
+    } else {
+      //Else, undo the last shift
+      var [x, y] = this.activeSquare;
+      var [n, d] = this.activeTurn.pop();
+      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      this.state = State.Shift;
+      [x, y] = [x-d[0], x-d[1]];
+      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      this.activeSquare = [x, y];
+      this.activeBoards.pop();
     }
   }
-}
 
+  /**
+   * Ends the turn
+   */
+  endTurn() {
+    this.activeBoards = this.activeBoards.slice(-1);
+    this.activePlayer = !this.activePlayer;
+    this.log.push(this.activeTurn);
+    this.resetTurn();
+  }
 
+  /**
+   * Checks for the winner
+   * 
+   * @returns {Player} - the colour of the winner, or nothing if there is no winner
+   */
+  winner() {
+    const corners = [[0,0], [0,5], [5,0], [5,5]]
+    var endGame = true;
+    var tops;
+    for (const [x, y] of corners) {
+      if (this.activeBoard[x][y].length === 0){
+        endGame = false;
+        break;
+      } else if (this.activeBoard[x][y].length === 4){
+        continue;
+      } else {
+        let p = this.activeBoard[x][y].slice(-1)[0];
+        if (tops.contains(!p)) {
+          endGame = false;
+          break;
+        }
+        tops.push(p);
+      }
+    }
+    if (endGame) {
+      return tops[0];
+    }
+  }
 }
