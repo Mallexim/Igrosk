@@ -5,12 +5,12 @@ const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
 let x = 0;
 let y = 0;
+let color = 0;
 
 //Constants
 const Player = Object.freeze({White: false, Black: true});
 const Direction = Object.freeze({Up: [-1,0], Down: [1,0], Left: [-1,0], Right: [1,0]});
 const State = Object.freeze({Drop: "drop", Shift: "shift", Stop: "stop"});
-let color = 0;
 
 function coordToIndex(x, y) {
   return 6 * x + y;
@@ -39,7 +39,7 @@ switches.forEach((switchElement) => {
 
 // Remove all child elements from squares
 function removeAllPieces() {
-  squares.forEach((square) => {
+  document.querySelectorAll(".square").forEach((square) => {
     square.innerHTML = "";
   });
 }
@@ -149,8 +149,8 @@ function drawBoard(board) {
   removeAllPieces();
 
   // loop through each position on the board
-  for (let x = 0; x < 6; x++) {
-    for (let y = 0; y < 6; y++) {
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board[x].length; y++) {
       for (let z = 0; z < board[x][y].length; z++) {
         drawPiece(x, y, board[x][y][z]);
       }
@@ -161,7 +161,7 @@ function drawBoard(board) {
 
 function drawPiece(x, y, color) {
   // find the corresponding square element and create a new oval element
-  const square = squares[coordToIndex(x, y)];
+  const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
   const oval = document.createElement("div");
 
   // add classes to the oval element for styling
@@ -174,7 +174,7 @@ function drawPiece(x, y, color) {
 /**
  * Removes any event listeners from elements with class `square`.
  */
-function removeDropEventListeners() {
+function removeSquareEventListeners() {
   const squares = document.querySelectorAll(".square");
   // clone each square and replace the original with the clone
   squares.forEach((squareElement) => {
@@ -214,7 +214,8 @@ function addDropEventListeners(game) {
       squareElement.addEventListener('click', (event) => {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
-        addShiftEventtListeners(game);
+        resetEventListeners(game);
+        activateEndTurnButton(game);
       });
     }
   });
@@ -232,12 +233,14 @@ function addShiftEventtListeners(game) {
   const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
     ".child"
   );
-  tower = game.activeBoard[x][y];
+  var tower = game.activeBoard[x][y];
   for (let i = 1; i <= tower.length; i++) {
     if (tower[tower.length-i] === game.activePlayer) {
       pieceElements[tower.length-i].addEventListener("click", (event) => {
         console.log(`Clicked piece at ${x},${y},${i}`);
+        removeSquareEventListeners();
         addOrthogonalEventListeners(game, i);
+        addShiftEventtListeners(game);
       });
     } else {
       break;
@@ -265,12 +268,47 @@ function addOrthogonalEventListeners(game, n) {
         game.addShift(n, [dx,dy]);
         drawBoard(game.activeBoard);
         console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
-        if (game.state === State.Shift) {
-          addShiftEventtListeners(game);
-        }
+        resetEventListeners(game);
       });
     }
   }
+}
+
+/**
+ * Adds click event listeners based on the game state
+ * 
+ * @param {Game} game - The game object
+ */
+function resetEventListeners(game) {
+  removeSquareEventListeners();
+  switch (game.state) {
+    case State.Drop:
+      addDropEventListeners(game);
+      break;
+    case State.Shift:
+      addShiftEventtListeners(game);
+      break;
+    case State.Stop:
+      break;
+  }
+}
+
+
+function deactivateEndTurnButton() {
+  endTurnButton = document.getElementById('endturn');
+  buttonCopy = endTurnButton.cloneNode(true);
+  endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
+}
+
+function activateEndTurnButton(game) {
+  endTurnButton = document.getElementById('endturn');
+  endTurnButton.addEventListener('click', () => {
+    game.endTurn();
+    removeShiftEventListeners();
+    removeSquareEventListeners();
+    addClickEventListeners();
+    deactivateEndTurnButton();
+  })
 }
 
 
@@ -307,7 +345,7 @@ class Game {
    * @returns {boolean} `true` if the drop is legal, `false` otherwise.
    */
   isLegalDrop(x, y) {
-    tower = this.activeBoard[x][y];
+    var tower = this.activeBoard[x][y];
     return (tower.length === 0 || (tower.length < 4 && tower.slice(-1)[0] === this.activePlayer));
   }
 
@@ -323,7 +361,7 @@ class Game {
 
       // Update the board, the interface
       this.activeBoard[x][y].push(this.activePlayer);
-      this.activeSquare = (x, y);
+      this.activeSquare = [x, y];
       this.state = State.Shift;
       this.activeTurn.push([x,y]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
@@ -379,15 +417,15 @@ class Game {
   addShift(n, d) {
     if (isLegalShift(n, d)) {
       var [x, y] = this.activeSquare;
-      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
       //If there was no piece left at the previous square,
       //the turn will be forced to end after this shift
-      tower = this.activeBoard[x][y];
+      var tower = this.activeBoard[x][y];
       if (tower.length === 0 || tower[tower.length-1] === !this.activePlayer) {
         this.state = State.Stop;
       }
       [x, y] = [x+d[0], y+d[1]];
-      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      this.activeBoard[x][y] = this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
       this.activeTurn.push([x, y]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
