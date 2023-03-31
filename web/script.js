@@ -8,36 +8,50 @@ let y = 0;
 let color = 0;
 
 //Constants
-const Player = Object.freeze({White: false, Black: true});
-const Direction = Object.freeze({Up: [-1,0], Down: [1,0], Left: [-1,0], Right: [1,0]});
-const State = Object.freeze({Drop: "drop", Shift: "shift", Stop: "stop"});
+const Player = Object.freeze({ White: false, Black: true });
+const Direction = Object.freeze({ Up: [-1, 0], Down: [1, 0], Left: [-1, 0], Right: [1, 0] });
+const State = Object.freeze({ Drop: "drop", Shift: "shift", Stop: "stop" });
 
+/**
+ * Converts 2D coordinates to 1D index.
+ * @param {number} x - The x-coordinate.
+ * @param {number} y - The y-coordinate.
+ * @returns {number} - The 1D index.
+ */
 function coordToIndex(x, y) {
   return 6 * x + y;
 }
 
+/**
+ * Converts 1D index to 2D coordinates.
+ * @param {number} i - The index.
+ * @returns {number[]} - The 2D coordinates as an array.
+ */
 function indexToCoord(i) {
   return [Math.floor(i / 6), i % 6];
 }
 
-// Add click event listener to switches
-switches.forEach((switchElement) => {
-  switchElement.addEventListener("click", () => {
-    if (activeSwitch) {
-      activeSwitch.classList.remove("active");
-    }
-    activeSwitch = switchElement;
-    activeSwitch.classList.add("active");
-    if (activeSwitch.classList.contains("light")) {
-      color = 0;
-    } else if (activeSwitch.classList.contains("dark")) {
-      color = 1;
-    }
-    console.log(color);
-  });
-});
+// // Add click event listener to switches
+// switches.forEach((switchElement) => {
+//   switchElement.addEventListener("click", () => {
+//     if (activeSwitch) {
+//       activeSwitch.classList.remove("active");
+//     }
+//     activeSwitch = switchElement;
+//     activeSwitch.classList.add("active");
+//     if (activeSwitch.classList.contains("light")) {
+//       color = 0;
+//     } else if (activeSwitch.classList.contains("dark")) {
+//       color = 1;
+//     }
+//     console.log(color);
+//   });
+// });
 
 // Remove all child elements from squares
+/**
+ * Removes all pieces from the game board.
+ */
 function removeAllPieces() {
   document.querySelectorAll(".square").forEach((square) => {
     square.innerHTML = "";
@@ -47,6 +61,12 @@ function removeAllPieces() {
 const removeAllButton = document.getElementById("remove-all");
 removeAllButton.addEventListener("click", removeAllPieces);
 
+/**
+ * Returns the current state of the game board as a string.
+ *
+ * @param {NodeList} squares - The squares of the game board.
+ * @returns {string} - The current state of the board as a string.
+ */
 function getBoardState(squares) {
   let text = "";
   squares.forEach((squareElement, index) => {
@@ -64,6 +84,11 @@ function getBoardState(squares) {
   return text;
 }
 
+/**
+ * Adds a piece to the specified square when clicked, as long as the square is not already full.
+ *
+ * @param {Node} square - The square onto which a piece should be added.
+ */
 function addPieceOnClick(square) {
   // Check if the square has less than 4 child elements
   if (square.children.length < 4) {
@@ -85,6 +110,9 @@ function addPieceOnClick(square) {
 //   });
 // });
 
+/**
+ * Sets the board state based on the input text in outputTextarea.
+ */
 function setBoardState() {
   // split the input value at each "/" character
   const values = outputTextarea.value.trim().split("/");
@@ -108,40 +136,47 @@ function setBoardState() {
 
 outputTextarea.addEventListener("input", setBoardState);
 
-function removePiece(row, col) {
-  const square = squares[coordToIndex(row, col)];
+// /**
+//  * Removes a piece from the specified square.
+//  *
+//  * @param {number} row - The row containing the piece to be removed.
+//  * @param {number} col - The column containing the piece to be removed.
+//  */
+// function removePiece(row, col) {
+//   const square = squares[coordToIndex(row, col)];
 
-  // Check if the square has any child elements
-  if (square.children.length > 0) {
-    // Remove the last child element from the square
-    square.removeChild(square.lastChild);
-  }
-}
+//   // Check if the square has any child elements
+//   if (square.children.length > 0) {
+//     // Remove the last child element from the square
+//     square.removeChild(square.lastChild);
+//   }
+// }
 
 // Add click event listener to test button
-const testButton = document.querySelector(".test");
-testButton.addEventListener("click", () => {
-  // console.log([x, y]);
-  outputTextarea2.value = [x, y, color];
-  drawPiece(x, y, color);
-});
+// const testButton = document.querySelector(".test");
+// testButton.addEventListener("click", () => {
+//   // console.log([x, y]);
+//   outputTextarea2.value = [x, y, color];
+//   drawPiece(x, y, color);
+// });
 
-const deletePieceButton = document.querySelector(".deletePiece");
-const deletePieceText = document.querySelector(".deletePieceText");
-deletePieceButton.addEventListener("click", () => {
-  const coordinates = deletePieceText.value.trim().split(",");
-  if (coordinates.length === 2) {
-    let row = parseInt(coordinates[0]);
-    let col = parseInt(coordinates[1]);
-    console.log(`x: ${row}, y: ${col}`);
-    removePiece(row, col);
-  }
-});
+// const deletePieceButton = document.querySelector(".deletePiece");
+// const deletePieceText = document.querySelector(".deletePieceText");
+// deletePieceButton.addEventListener("click", () => {
+//   const coordinates = deletePieceText.value.trim().split(",");
+//   if (coordinates.length === 2) {
+//     let row = parseInt(coordinates[0]);
+//     let col = parseInt(coordinates[1]);
+//     console.log(`x: ${row}, y: ${col}`);
+//     removePiece(row, col);
+//   }
+// });
+
 
 /**
  * Draws the pieces on the board based on the input game state.
  *
- * @param {number[][][]} 
+ * @param {number[][][]}
  The state of the game board.
   */
 function drawBoard(board) {
@@ -158,7 +193,13 @@ function drawBoard(board) {
   }
 }
 
-
+/**
+ * Draws a piece on the board at the specified position with the specified color.
+ *
+ * @param {number} x - The x-coordinate of the piece.
+ * @param {number} y - The y-coordinate of the piece.
+ * @param {number} color - The color of the piece.
+ */
 function drawPiece(x, y, color) {
   // find the corresponding square element and create a new oval element
   const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
@@ -228,15 +269,15 @@ function addDropEventListeners(game) {
    * @param {Game} game - The game object
    */
 function addShiftEventtListeners(game) {
-  var [x,y] = game.activeSquare;
+  var [x, y] = game.activeSquare;
   const squares = document.querySelectorAll(".square");
   const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
     ".child"
   );
   var tower = game.activeBoard[x][y];
   for (let i = 1; i <= tower.length; i++) {
-    if (tower[tower.length-i] === game.activePlayer) {
-      pieceElements[tower.length-i].addEventListener("click", (event) => {
+    if (tower[tower.length - i] === game.activePlayer) {
+      pieceElements[tower.length - i].addEventListener("click", (event) => {
         console.log(`Clicked piece at ${x},${y},${i}`);
         removeSquareEventListeners();
         addOrthogonalEventListeners(game, i);
@@ -261,11 +302,11 @@ function addOrthogonalEventListeners(game, n) {
   const squares = document.querySelectorAll(".square");
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
   for (const [dx, dy] of directions) {
-    if (game.isLegalShift(n, [dx,dy])) {
+    if (game.isLegalShift(n, [dx, dy])) {
       const square = squares[coordToIndex(x + dx, y + dy)];
       square.addEventListener('click', (event) => {
         removeShiftEventListeners(x, y);
-        game.addShift(n, [dx,dy]);
+        game.addShift(n, [dx, dy]);
         drawBoard(game.activeBoard);
         console.log(`Moving ${n} pieces from ${x},${y} to ${x + dx},${y + dy}`);
         resetEventListeners(game);
@@ -294,12 +335,25 @@ function resetEventListeners(game) {
 }
 
 
+/**
+ * Deactivates the end turn button.
+ * Replaces the current end turn button with a copy of itself to remove event listeners on it.
+ *
+ */
 function deactivateEndTurnButton() {
   endTurnButton = document.getElementById('endturn');
   buttonCopy = endTurnButton.cloneNode(true);
   endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
 }
 
+/**
+ * Activates the end turn button.
+ * Calls game.endTurn() when the button is clicked.
+ * Removes all shift and square event listeners and adds click event listeners.
+ * Deactivates the end turn button after it has been clicked.
+ *
+ * @param {Game} game - The game object.
+ */
 function activateEndTurnButton(game) {
   endTurnButton = document.getElementById('endturn');
   endTurnButton.addEventListener('click', () => {
@@ -313,10 +367,13 @@ function activateEndTurnButton(game) {
 
 
 /**
- * Class for the inner logic of the game
+ * The Game class keeps track of the game state and handles game logic
  */
 class Game {
-  
+
+  /**
+   * Creates a new Game object with an empty board and sets the active player to white
+   */
   constructor() {
     this.activeBoard = new Array(6).fill(null).map(() => new Array(6).fill(null).map(() => new Array(0)));
     this.activeBoards = [JSON.stringify(this.activeBoard)];
@@ -350,62 +407,65 @@ class Game {
   }
 
   /**
- * Adds a piece to the specified square and updates the game state accordingly.
- * @param {number} x - The x-coordinate of the square.
- * @param {number} y - The y-coordinate of the square.
- * @returns {boolean} - True if the piece was successfully added, false otherwise.
- */
+   * Adds a piece to the specified square and updates the game state accordingly.
+   *
+   * @param {number} x - The x-coordinate of the square.
+   * @param {number} y - The y-coordinate of the square.
+   * @returns {boolean} - True if the piece was successfully added, false otherwise.
+   */
   addDrop(x, y) {
-
-    if (this.isLegalDrop(x,y)) {
-
-      // Update the board, the interface
+    // Check if the drop is legal
+    if (this.isLegalDrop(x, y)) {
+      // Update the board
       this.activeBoard[x][y].push(this.activePlayer);
+      // Update the active square
       this.activeSquare = [x, y];
+      // Update the game state to shift
       this.state = State.Shift;
-      this.activeTurn.push([x,y]);
+      // Add the current turn to the list of active turns
+      this.activeTurn.push([x, y]);
+      // Add the current board state to the list of active board states
       this.activeBoards.push(JSON.stringify(this.activeBoard));
       return true;
     }
-
     return false;
-
   }
 
   /**
-   * Checks if a player can move n pieces in a given direction
-   * 
-   * @param {number} n - The number of pieces to be moved
-   * @param {Direction} d - The direction
-   * @returns {boolean} - true if the shift is legal, false otherwise
-   */
+ * Checks if a player can move n pieces in a given direction
+ *
+ * @param {number} n - The number of pieces to be moved
+ * @param {Direction} d - The direction
+ * @returns {boolean} - true if the shift is legal, false otherwise
+ */
   isLegalShift(n, d) {
     var [x, y] = this.activeSquare;
     var pile = this.activeBoard[x][y].slice(-n);
     //Fail case: not enough pieces of the same colour
-    if (pile.length < n || pile.includes(!this.activePlayer)){
+    if (pile.length < n || pile.includes(!this.activePlayer)) {
       return false;
     }
-    var [nx, ny] = [x+d[0], y+d[1]];
+    var [nx, ny] = [x + d[0], y + d[1]];
     //Fail case: moving off the board
-    if (nx<0 || nx>5 || ny<0 || ny>5) {
+    if (nx < 0 || nx > 5 || ny < 0 || ny > 5) {
       return false;
     }
     //Fail case: new tower is taller than old
-    if (this.activeBoard[nx][ny].length+n > this.activeBoard[x][y].length) {
+    if (this.activeBoard[nx][ny].length + n > this.activeBoard[x][y].length) {
       return false;
     }
     //Fail case: new position has already happened this turn
-    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
     this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
     var s = JSON.stringify(this.activeBoard);
-    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0,-n);
+    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0, -n);
     this.activeBoard[x][y] = this.activeBoard.concat(pile);
     if (this.activeBoards.includes(s)) {
       return false;
     }
     return true;
   }
+
 
   /**
    * Moves n pieces in direction d and updates the game accordingly
@@ -417,14 +477,14 @@ class Game {
   addShift(n, d) {
     if (isLegalShift(n, d)) {
       var [x, y] = this.activeSquare;
-      this.activeBoard[x][y] = this.activeBoard[x][y].slice(0,-n);
+      this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
       //If there was no piece left at the previous square,
       //the turn will be forced to end after this shift
       var tower = this.activeBoard[x][y];
-      if (tower.length === 0 || tower[tower.length-1] === !this.activePlayer) {
+      if (tower.length === 0 || tower[tower.length - 1] === !this.activePlayer) {
         this.state = State.Stop;
       }
-      [x, y] = [x+d[0], y+d[1]];
+      [x, y] = [x + d[0], y + d[1]];
       this.activeBoard[x][y] = this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
       this.activeTurn.push([x, y]);
@@ -447,7 +507,7 @@ class Game {
       var [n, d] = this.activeTurn.pop();
       this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
       this.state = State.Shift;
-      [x, y] = [x-d[0], x-d[1]];
+      [x, y] = [x - d[0], x - d[1]];
       this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
       this.activeBoards.pop();
@@ -466,18 +526,18 @@ class Game {
 
   /**
    * Checks for the winner
-   * 
+   *
    * @returns {Player} - the colour of the winner, or nothing if there is no winner
    */
   winner() {
-    const corners = [[0,0], [0,5], [5,0], [5,5]]
+    const corners = [[0, 0], [0, 5], [5, 0], [5, 5]]
     var endGame = true;
     var tops;
     for (const [x, y] of corners) {
-      if (this.activeBoard[x][y].length === 0){
+      if (this.activeBoard[x][y].length === 0) {
         endGame = false;
         break;
-      } else if (this.activeBoard[x][y].length === 4){
+      } else if (this.activeBoard[x][y].length === 4) {
         continue;
       } else {
         let p = this.activeBoard[x][y].slice(-1)[0];
