@@ -84,21 +84,21 @@ function getBoardState(squares) {
   return text;
 }
 
-/**
- * Adds a piece to the specified square when clicked, as long as the square is not already full.
- *
- * @param {Node} square - The square onto which a piece should be added.
- */
-function addPieceOnClick(square) {
-  // Check if the square has less than 4 child elements
-  if (square.children.length < 4) {
-    // Create a new div element with the classes .child, .oval, and .light or .dark depending on the value of the color variable
-    const newDiv = document.createElement("div");
-    newDiv.classList.add("child", "oval", color ? "dark" : "light");
-    // Append the new div element to the clicked square
-    square.appendChild(newDiv);
-  }
-}
+// /**
+//  * Adds a piece to the specified square when clicked, as long as the square is not already full.
+//  *
+//  * @param {Node} square - The square onto which a piece should be added.
+//  */
+// function addPieceOnClick(square) {
+//   // Check if the square has less than 4 child elements
+//   if (square.children.length < 4) {
+//     // Create a new div element with the classes .child, .oval, and .light or .dark depending on the value of the color variable
+//     const newDiv = document.createElement("div");
+//     newDiv.classList.add("child", "oval", color ? "dark" : "light");
+//     // Append the new div element to the clicked square
+//     square.appendChild(newDiv);
+//   }
+// }
 
 // Loop through each square element and add a click event listener
 // squares.forEach((square) => {
@@ -184,8 +184,8 @@ function drawBoard(board) {
   removeAllPieces();
 
   // loop through each position on the board
-  for (let x = 0; x < board.length; x++) {
-    for (let y = 0; y < board[x].length; y++) {
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
       for (let z = 0; z < board[x][y].length; z++) {
         drawPiece(x, y, board[x][y][z]);
       }
@@ -203,13 +203,13 @@ function drawBoard(board) {
 function drawPiece(x, y, color) {
   // find the corresponding square element and create a new oval element
   const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
-  const oval = document.createElement("div");
+  const piece = document.createElement("div");
 
-  // add classes to the oval element for styling
-  oval.classList.add("child", "oval", color ? "dark" : "light");
+  // add classes to the piece element for styling
+  piece.classList.add("child", "oval", color ? "dark" : "light");
 
-  // add the oval element to the square element
-  square.appendChild(oval);
+  // add the piece element to the square element
+  square.appendChild(piece);
 }
 
 /**
@@ -355,7 +355,7 @@ function deactivateEndTurnButton() {
  * @param {Game} game - The game object.
  */
 function activateEndTurnButton(game) {
-  endTurnButton = document.getElementById('endturn');
+  endTurnButton = document.getElementById('endTurn');
   endTurnButton.addEventListener('click', () => {
     game.endTurn();
     removeShiftEventListeners();
@@ -455,14 +455,14 @@ class Game {
       return false;
     }
     //Fail case: new position has already happened this turn
-    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
-    this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
-    var s = JSON.stringify(this.activeBoard);
-    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0, -n);
-    this.activeBoard[x][y] = this.activeBoard.concat(pile);
-    if (this.activeBoards.includes(s)) {
-      return false;
-    }
+    // this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
+    // this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
+    // var s = JSON.stringify(this.activeBoard);
+    // this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0, -n);
+    // this.activeBoard[x][y] = this.activeBoard.concat(pile);
+    // if (this.activeBoards.includes(s)) {
+    //   return false;
+    // }
     return true;
   }
 
@@ -475,7 +475,7 @@ class Game {
    * @returns {boolean} - true if the shift is legal, false otherwise
    */
   addShift(n, d) {
-    if (isLegalShift(n, d)) {
+    if (this.isLegalShift(n, d)) {
       var [x, y] = this.activeSquare;
       this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
       //If there was no piece left at the previous square,
@@ -553,3 +553,6 @@ class Game {
     }
   }
 }
+
+g = new Game();
+resetEventListeners(g);
