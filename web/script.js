@@ -330,6 +330,8 @@ function activateUndoMoveButton(game) {
     game.undoMove();
     if (game.activeTurn.length == 0) {
       deactivateUndoMoveButton();
+      deactivateEndTurnButton();
+
     }
     drawBoard(game.activeBoard);
     resetEventListeners(game);
