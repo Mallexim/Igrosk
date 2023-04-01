@@ -61,55 +61,6 @@ function removeAllPieces() {
 const removeAllButton = document.getElementById("remove-all");
 removeAllButton.addEventListener("click", removeAllPieces);
 
-// /**
-//  * Returns the current state of the game board as a string.
-//  *
-//  * @param {NodeList} squares - The squares of the game board.
-//  * @returns {string} - The current state of the board as a string.
-//  */
-// function getBoardState(squares) {
-//   let text = "";
-//   squares.forEach((squareElement, index) => {
-//     let [x, y] = indexToCoord(index);
-//     for (let i = 0; i < squareElement.children.length; i++) {
-//       const child = squareElement.children[i];
-//       if (child.classList.contains("dark")) {
-//         text += "1";
-//       } else if (child.classList.contains("light")) {
-//         text += "0";
-//       }
-//     }
-//     text += "/";
-//   });
-//   return text;
-// }
-
-// /**
-//  * Adds a piece to the specified square when clicked, as long as the square is not already full.
-//  *
-//  * @param {Node} square - The square onto which a piece should be added.
-//  */
-// function addPieceOnClick(square) {
-//   // Check if the square has less than 4 child elements
-//   if (square.children.length < 4) {
-//     // Create a new div element with the classes .child, .oval, and .light or .dark depending on the value of the color variable
-//     const newDiv = document.createElement("div");
-//     newDiv.classList.add("child", "oval", color ? "dark" : "light");
-//     // Append the new div element to the clicked square
-//     square.appendChild(newDiv);
-//   }
-// }
-
-// Loop through each square element and add a click event listener
-// squares.forEach((square) => {
-//   square.addEventListener("click", () => {
-//     // Call the addPieceOnClick function with the clicked square element as the argument
-//     addPieceOnClick(square);
-//     // Update the value of the outputTextarea element with the current state of the board
-//     outputTextarea.value = getBoardState(squares);
-//   });
-// });
-
 /**
  * Sets the board state based on the input text in outputTextarea.
  */
@@ -556,11 +507,21 @@ class Game {
   }
 }
 
+/**
+ * Debug class for debugging the game.
+ *
+ * @param {Game} game An instance of the Game class.
+ */
 class Debug {
   constructor(game) {
     this.game = game;
   }
 
+  /**
+   * Get the state of the board.
+   *
+   * @returns {string} A string representing the state of the board.
+   */
   getBoardState() {
     let text = "";
     for (let x = 0; x < 6; x++) {
@@ -575,6 +536,11 @@ class Debug {
     return text;
   }
 
+  /**
+   * Log the state of the board to the console at regular intervals.
+   *
+   * @param {number} time The interval in milliseconds.
+   */
   logBoardState(time) {
     setInterval(() => {
       const boardState = this.getBoardState();
