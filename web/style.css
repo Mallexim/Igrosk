@@ -164,8 +164,7 @@ aside div svg {
   display: block;
   width: 10px;
   height: 10px;
-  background-color: #8B4513;
-  opacity: 0.6;
+  background-color: var(--color-shadow);
   position: absolute;
   top: 50%;
   left: 50%;
