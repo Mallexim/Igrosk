@@ -163,6 +163,7 @@ function removeSquareEventListeners() {
   const squares = document.querySelectorAll(".square");
   // clone each square and replace the original with the clone
   squares.forEach((squareElement) => {
+    squareElement.classList.remove("legal");
     const clonedSquare = squareElement.cloneNode(true);
     squareElement.parentNode.replaceChild(clonedSquare, squareElement);
   });
@@ -196,6 +197,7 @@ function addDropEventListeners(game) {
     let [x, y] = indexToCoord(index);
 
     if (game.isLegalDrop(x, y)) {
+      squareElement.classList.add("legal");
       squareElement.addEventListener('click', (event) => {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
@@ -248,6 +250,7 @@ function addOrthogonalEventListeners(game, n) {
   for (const [dx, dy] of directions) {
     if (game.isLegalShift(n, [dx, dy])) {
       const square = squares[coordToIndex(x + dx, y + dy)];
+      square.classList.add("legal");
       square.addEventListener('click', (event) => {
         removeShiftEventListeners(x, y);
         game.addShift(n, [dx, dy]);
