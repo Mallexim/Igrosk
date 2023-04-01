@@ -1,10 +1,3 @@
-const squares = document.querySelectorAll(".square");
-const outputTextarea = document.querySelector(".output");
-const outputTextarea2 = document.querySelector(".output2");
-let x = 0;
-let y = 0;
-let color = 0;
-
 //Constants
 const Player = Object.freeze({ White: false, Black: true });
 const Direction = Object.freeze({ Up: [-1, 0], Down: [1, 0], Left: [-1, 0], Right: [1, 0] });
@@ -53,32 +46,6 @@ function removeAllPieces() {
 
 // const removeAllButton = document.getElementById("remove-all");
 // removeAllButton.addEventListener("click", removeAllPieces);
-
-/**
- * Sets the board state based on the input text in outputTextarea.
- */
-function setBoardState() {
-  // split the input value at each "/" character
-  const values = outputTextarea.value.trim().split("/");
-  // clear the contents of all the squares
-  removeAllPieces();
-  squares.forEach((squareElement, index) => {
-    // loop through each character in the corresponding values array
-    for (let i = 0; i < values[index].length; i++) {
-      // create a new div element with the appropriate class based on the character value
-      const child = document.createElement("div");
-      if (values[index][i] === "1") {
-        child.classList.add("child", "oval", "dark");
-      } else if (values[index][i] === "0") {
-        child.classList.add("child", "oval", "light");
-      }
-      // append the new div element to the square element
-      squareElement.appendChild(child);
-    }
-  });
-}
-
-outputTextarea.addEventListener("input", setBoardState);
 
 // /**
 //  * Removes a piece from the specified square.
@@ -572,6 +539,26 @@ class Debug {
   }
 
   /**
+   * Sets the state of the board based on the input string.
+   *
+   * @param {string} text - The input string containing the state of the board.
+   */
+  setBoardState(text) {
+    this.game = new Game();
+    this.game.resetTurn();
+    const values = text.trim().split("/");
+    for (let i = 0; i < values.length; i++) {
+      const [x, y] = indexToCoord(i);
+      for (let j = 0; j < values[i].length; j++) {
+        const piece = values[i][j] == 1 ? true : false;
+        this.game.activeBoard[x][y].push(piece);
+      }
+    }
+    drawBoard(this.game.activeBoard)
+    resetEventListeners(this.game);
+  }
+
+  /**
    * Log the state of the board to the console at regular intervals.
    *
    * @param {number} time The interval in milliseconds.
@@ -583,6 +570,19 @@ class Debug {
     }, time);
   }
 
+  /**
+   * Adds an event listener to the Load Board button.
+   *
+   * When the button is clicked, the board state is set to the value of the outputTextarea element.
+   */
+  addLoadBoardListener() {
+    const loadBoardButton = document.querySelector("#loadBoard");
+    loadBoardButton.addEventListener("click", () => {
+      const outputTextarea = document.querySelector(".output");
+      this.setBoardState(outputTextarea.value);
+    });
+  }
+
 }
 
 g = new Game();
@@ -590,3 +590,4 @@ resetEventListeners(g);
 
 debug = new Debug(g);
 debug.logBoardState(1000);
+debug.addLoadBoardListener();
