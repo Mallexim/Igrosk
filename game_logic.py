@@ -257,3 +257,27 @@ class Game:
             if self.curr_turn_end == True and len(turn) > len(self.curr_turn):
                 raise Exception(f"Invalid turn #{len(self.log)}, end flag raised")
         self.end_turn()
+
+    def winner(self):
+        """
+        Determines the winner of the game by checking if one player has control of all four corners of the board.
+
+        Returns:
+            - None if no player has control of all four corners.
+            - The color of the player who controls all four corners.
+        """
+        corners = [[0, 0], [0, 5], [5, 0], [5, 5]]
+        tops = []
+        for corner in corners:
+            x, y = corner
+            if len(self.board[x][y]) == 0:
+                return None
+            elif len(self.board[x][y]) == 4:
+                continue
+            else:
+                p = self.board[x][y][-1]
+                tops.append(p)
+        if all(x == tops[0] for x in tops):
+            return tops[0]
+        else:
+            return None
