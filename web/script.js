@@ -51,8 +51,8 @@ function removeAllPieces() {
   });
 }
 
-const removeAllButton = document.getElementById("remove-all");
-removeAllButton.addEventListener("click", removeAllPieces);
+// const removeAllButton = document.getElementById("remove-all");
+// removeAllButton.addEventListener("click", removeAllPieces);
 
 /**
  * Sets the board state based on the input text in outputTextarea.

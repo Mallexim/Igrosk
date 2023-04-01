@@ -31,9 +31,10 @@ body {
 .bcontainer {
 /*   display: block; */
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   flex-grow: 2;
-  
+  padding: 10px;
 }
 
 .container {
@@ -252,7 +253,7 @@ input {
   border-radius: 5px;
   padding: 10px;
   margin: 2px;
-/*   width: 100%; */
+  /* width: 95%; */
 }
 
 .ccontainer {
@@ -267,7 +268,6 @@ input {
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #222;
-    
 }
 
 button {
