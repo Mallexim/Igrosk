@@ -1,5 +1,3 @@
-const switches = document.querySelectorAll(".switch");
-let activeSwitch = document.querySelector(".switch.active");
 const squares = document.querySelectorAll(".square");
 const outputTextarea = document.querySelector(".output");
 const outputTextarea2 = document.querySelector(".output2");
@@ -31,22 +29,17 @@ function indexToCoord(i) {
   return [Math.floor(i / 6), i % 6];
 }
 
-// // Add click event listener to switches
-// switches.forEach((switchElement) => {
-//   switchElement.addEventListener("click", () => {
-//     if (activeSwitch) {
-//       activeSwitch.classList.remove("active");
-//     }
-//     activeSwitch = switchElement;
-//     activeSwitch.classList.add("active");
-//     if (activeSwitch.classList.contains("light")) {
-//       color = 0;
-//     } else if (activeSwitch.classList.contains("dark")) {
-//       color = 1;
-//     }
-//     console.log(color);
-//   });
-// });
+/**
+ * Changes the active switch and its corresponding color.
+ */
+function changeSwitch() {
+  const activeSwitch = document.querySelector(".switch.active");
+  const inactiveSwitch = document.querySelector(`.switch.circle.${activeSwitch.classList.contains("light") ? "dark" : "light"}`);
+
+  // Remove the "active" class from the currently active switch and add it to the inactive switch
+  activeSwitch.classList.remove("active");
+  inactiveSwitch.classList.add("active");
+}
 
 // Remove all child elements from squares
 /**
@@ -313,6 +306,7 @@ function activateEndTurnButton(game) {
     removeSquareEventListeners();
     resetEventListeners(game);
     deactivateEndTurnButton();
+    changeSwitch();
   })
 }
 
