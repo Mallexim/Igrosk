@@ -132,18 +132,17 @@ class Game:
             move (if moving a tower).
         """
         lm = []
-        if self.curr_square == None:
-            # Find all positions where it is legal to drop a new piece
+        # If no piece has been dropped yet, find all positions
+        # where it is legal to drop a new piece.
+        if self.curr_square is None:
             for x in range(6):
                 for y in range(6):
                     if self.is_legal_drop(x, y):
                         lm.append(((x, y), None))
-        else:
-            # Find all legal towers+directions to move the towers,
-            # as long as the turn can continue (i.e. there was a piece left
-            # at the previous square)
-            if self.curr_turn_end:
-                return []
+        # Otherwise, find all legal towers+directions to move the towers,
+        # as long as the turn can continue (i.e. there was a piece left
+        # at the previous square)
+        elif not self.curr_turn_end:
             for n in range(1, 5):
                 for d in (Up, Down, Left, Right):
                     if self.is_legal_shift(n, d):
