@@ -1,10 +1,7 @@
-ExeRrzG
+The Web Interfae
 -------
 
-
-A [Pen](https://codepen.io/kingalejandro/pen/ExeRrzG) by [KingAlejandro](https://codepen.io/kingalejandro) on [CodePen](https://codepen.io).
-
-[License](https://codepen.io/license/pen/ExeRrzG).
+The web interface can be viewed [here](https://htmlpreview.github.io/?https://github.com/Mallexim/Igrosk/blob/main/web/index.html).
 
 ## Game Logic Loop
 
