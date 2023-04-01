@@ -89,7 +89,7 @@ class Game:
         """
         # First fail case: not enough pieces of the same colour
         x, y = self.curr_square
-        last_n = self[x][y][-n:]
+        last_n = self.board[x][y][-n:]
         if len(last_n) < n or (not self.curr_player) in last_n:
             return False
         nx, ny = x+d[0], y+d[1]
@@ -160,7 +160,7 @@ class Game:
         Raises: Exception if the move is not legal
         """
         if self.is_legal_drop(x, y):
-            self.board[x][y] += self.curr_player
+            self.board[x][y].append(self.curr_player)
             self.curr_square = (x, y)
             self.curr_turn.append((x, y))
             self.curr_board_states.append(self.board_state())
@@ -184,10 +184,10 @@ class Game:
         """
         if self.is_legal_shift(n, d):
             x, y = self.curr_square
-            self.board[x][y] = self.board[x][y][:-n]
             # If there was no piece left at the previous square,
             # the turn will be forced to end after this move
-            if not self.board[x][y][-1] == self.curr_player:
+            self.board[x][y] = self.board[x][y][:-n]
+            if len(self.board[x][y]) == 0 or not self.board[x][y][-1] == self.curr_player:
                 self.curr_turn_end = True
             x, y = x+d[0], y+d[1]
             self.board[x][y] += [self.curr_player]*n
