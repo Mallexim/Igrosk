@@ -150,7 +150,7 @@ function drawPiece(x, y, color) {
   const piece = document.createElement("div");
 
   // add classes to the piece element for styling
-  piece.classList.add("child", "oval", color ? "dark" : "light");
+  piece.classList.add("child", "oval", `${color ? "dark" : "light"}`);
 
   // add the piece element to the square element
   square.appendChild(piece);
@@ -468,7 +468,7 @@ class Game {
       [x, y] = [x + d[0], y + d[1]];
       this.activeBoard[x][y] = this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
-      this.activeTurn.push([x, y]);
+      this.activeTurn.push([n, d]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
       return true;
     }
@@ -484,12 +484,15 @@ class Game {
       this.resetTurn();
     } else {
       //Else, undo the last shift
-      var [x, y] = this.activeSquare;
-      var [n, d] = this.activeTurn.pop();
-      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      let [x, y] = this.activeSquare;
+      // Get the number of pieces and direction of the last shift
+      const [n, d] = this.activeTurn.pop();
+      const removedPieces = this.activeBoard[x][y].splice(-n);
       this.state = State.Shift;
-      [x, y] = [x - d[0], x - d[1]];
-      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      // Get the coordinates of the previous square
+      [x, y] = [x - d[0], y - d[1]];
+      // Add the removed pieces back to the previous square
+      this.activeBoard[x][y] = this.activeBoard[x][y].concat(removedPieces);
       this.activeSquare = [x, y];
       this.activeBoards.pop();
     }
