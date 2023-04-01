@@ -404,15 +404,15 @@ class Game {
     if (this.activeBoard[nx][ny].length + n > this.activeBoard[x][y].length) {
       return false;
     }
-    //Fail case: new position has already happened this turn
-    // this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
-    // this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
-    // var s = JSON.stringify(this.activeBoard);
-    // this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0, -n);
-    // this.activeBoard[x][y] = this.activeBoard.concat(pile);
-    // if (this.activeBoards.includes(s)) {
-    //   return false;
-    // }
+    // Fail case: new position has already happened this turn
+    this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
+    this.activeBoard[nx][ny] = this.activeBoard[nx][ny].concat(Array(n).fill(this.activePlayer));
+    let s = JSON.stringify(this.activeBoard);
+    this.activeBoard[nx][ny] = this.activeBoard[nx][ny].slice(0, -n);
+    this.activeBoard[x][y] = this.activeBoard[x][y].concat(Array(n).fill(this.activePlayer));
+    if (this.activeBoards.includes(s)) {
+      return false;
+    }
     return true;
   }
 
