@@ -61,28 +61,28 @@ function removeAllPieces() {
 const removeAllButton = document.getElementById("remove-all");
 removeAllButton.addEventListener("click", removeAllPieces);
 
-/**
- * Returns the current state of the game board as a string.
- *
- * @param {NodeList} squares - The squares of the game board.
- * @returns {string} - The current state of the board as a string.
- */
-function getBoardState(squares) {
-  let text = "";
-  squares.forEach((squareElement, index) => {
-    let [x, y] = indexToCoord(index);
-    for (let i = 0; i < squareElement.children.length; i++) {
-      const child = squareElement.children[i];
-      if (child.classList.contains("dark")) {
-        text += "1";
-      } else if (child.classList.contains("light")) {
-        text += "0";
-      }
-    }
-    text += "/";
-  });
-  return text;
-}
+// /**
+//  * Returns the current state of the game board as a string.
+//  *
+//  * @param {NodeList} squares - The squares of the game board.
+//  * @returns {string} - The current state of the board as a string.
+//  */
+// function getBoardState(squares) {
+//   let text = "";
+//   squares.forEach((squareElement, index) => {
+//     let [x, y] = indexToCoord(index);
+//     for (let i = 0; i < squareElement.children.length; i++) {
+//       const child = squareElement.children[i];
+//       if (child.classList.contains("dark")) {
+//         text += "1";
+//       } else if (child.classList.contains("light")) {
+//         text += "0";
+//       }
+//     }
+//     text += "/";
+//   });
+//   return text;
+// }
 
 // /**
 //  * Adds a piece to the specified square when clicked, as long as the square is not already full.
@@ -525,9 +525,9 @@ class Game {
   }
 
   /**
-   * Checks for the winner
+   * Determines the winner of the game by checking if a player controls all active corners.
    *
-   * @returns {Player} - the colour of the winner, or null if there is no winner
+   * @returns {boolean} The color of the winning player, or null if there is no winner.
    */
   winner() {
     const corners = [[0, 0], [0, 5], [5, 0], [5, 5]];
@@ -556,5 +556,36 @@ class Game {
   }
 }
 
+class Debug {
+  constructor(game) {
+    this.game = game;
+  }
+
+  getBoardState() {
+    let text = "";
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        for (let z = 0; z < this.game.activeBoard[x][y].length; z++) {
+          let piece = this.game.activeBoard[x][y][z];
+          text += Number(piece);
+        }
+        text += "/"
+      }
+    }
+    return text;
+  }
+
+  logBoardState(time) {
+    setInterval(() => {
+      const boardState = this.getBoardState();
+      console.log(boardState);
+    }, time);
+  }
+
+}
+
 g = new Game();
 resetEventListeners(g);
+
+debug = new Debug(g);
+debug.logBoardState(1000);
