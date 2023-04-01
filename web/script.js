@@ -203,6 +203,7 @@ function addDropEventListeners(game) {
         drawBoard(game.activeBoard);
         resetEventListeners(game);
         activateEndTurnButton(game);
+        activateUndoMoveButton(game);
       });
     }
   });
@@ -311,8 +312,38 @@ function activateEndTurnButton(game) {
     removeSquareEventListeners();
     resetEventListeners(game);
     deactivateEndTurnButton();
+    deactivateUndoMoveButton();
     changeSwitch();
   })
+}
+
+/**
+ * Adds an event listener to the undo move button that calls the undoMove method on the given game object.
+ *
+ * @param {Game} game - The game object.
+ */
+function activateUndoMoveButton(game) {
+  UndoMoveButton = document.getElementById('undoMove');
+  UndoMoveButton.classList.add("active");
+  UndoMoveButton.addEventListener('click', () => {
+    console.log("Undo Move");
+    game.undoMove();
+    if (game.activeTurn.length == 0) {
+      deactivateUndoMoveButton();
+    }
+    drawBoard(game.activeBoard);
+    resetEventListeners(game);
+  })
+}
+
+/**
+ * Removes the active class from the undo move button.
+ */
+function deactivateUndoMoveButton() {
+  UndoMoveButton = document.getElementById('undoMove');
+  UndoMoveButton.classList.remove("active");
+  buttonCopy = UndoMoveButton.cloneNode(true);
+  UndoMoveButton.parentNode.replaceChild(buttonCopy, UndoMoveButton)
 }
 
 
