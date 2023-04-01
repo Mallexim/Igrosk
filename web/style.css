@@ -252,6 +252,25 @@ input {
     
 }
 
+button {
+  background-color: #8B4513;
+  border: 1px solid var(--color-white);
+  border-radius: 5px;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+button:not(.active) {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 @media all and (max-width: 700px) {
   .container, .bcontainer {
     /* On small screens, we are no longer using row direction but column */
