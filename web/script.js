@@ -341,7 +341,7 @@ function resetEventListeners(game) {
  *
  */
 function deactivateEndTurnButton() {
-  endTurnButton = document.getElementById('endturn');
+  endTurnButton = document.getElementById('endTurn');
   buttonCopy = endTurnButton.cloneNode(true);
   endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
 }
@@ -357,10 +357,10 @@ function deactivateEndTurnButton() {
 function activateEndTurnButton(game) {
   endTurnButton = document.getElementById('endTurn');
   endTurnButton.addEventListener('click', () => {
+    console.log("EndTurn button clicked")
     game.endTurn();
-    removeShiftEventListeners();
     removeSquareEventListeners();
-    addClickEventListeners();
+    resetEventListeners(game);
     deactivateEndTurnButton();
   })
 }
