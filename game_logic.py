@@ -99,7 +99,10 @@ class Game:
         # Third fail case: the new tower is taller than the old
         if len(self.board[nx][ny])+n > len(self.board[x][y]):
             return False
-        # Fourth fail case: the new position has already happened this turn
+        # Fourth fail case: if there are no pieces left at previous square
+        if self.curr_turn_end:
+            return False
+        # Fifth fail case: the new position has already happened this turn
         self.board[x][y] = self.board[x][y][:-n]
         self.board[nx][ny] += [self.curr_player]*n
         bs = self.board_state()
