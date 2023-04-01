@@ -527,29 +527,31 @@ class Game {
   /**
    * Checks for the winner
    *
-   * @returns {Player} - the colour of the winner, or nothing if there is no winner
+   * @returns {Player} - the colour of the winner, or null if there is no winner
    */
   winner() {
-    const corners = [[0, 0], [0, 5], [5, 0], [5, 5]]
-    var endGame = true;
-    var tops;
-    for (const [x, y] of corners) {
-      if (this.activeBoard[x][y].length === 0) {
-        endGame = false;
-        break;
-      } else if (this.activeBoard[x][y].length === 4) {
+    const corners = [[0, 0], [0, 5], [5, 0], [5, 5]];
+    const tops = [];
+    for (const corner of corners) {
+      const [x, y] = corner;
+      if (board[x][y].length === 0) {
+        // If one of the corners is empty, return null
+        return null;
+      } else if (board[x][y].length === 4) {
+        // If the corner has four pieces, continue to the next corner
         continue;
       } else {
-        let p = this.activeBoard[x][y].slice(-1)[0];
-        if (tops.contains(!p)) {
-          endGame = false;
-          break;
-        }
+        // If the corner is active, add the color of the owner to the tops array
+        const p = board[x][y][board[x][y].length - 1];
         tops.push(p);
       }
     }
-    if (endGame) {
+    // If all elements in the tops array are the same, return the winner
+    if (tops.every((x) => x === tops[0])) {
       return tops[0];
+    } else {
+      // If the top pieces are of different colors, return null
+      return null;
     }
   }
 }
