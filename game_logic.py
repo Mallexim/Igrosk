@@ -76,7 +76,7 @@ def is_legal_drop(self, x, y):
     return len(t) == 0 or (len(t) < 4 and t[-1] == self.curr_player)
 
 
-def is_legal_move(self, n, d):
+def is_legal_shift(self, n, d):
     """
     Checks if moving n pieces in direction d is a legal move.
 
@@ -143,7 +143,7 @@ def legal_moves(self):
             return []
         for n in range(1, 5):
             for d in (Up, Down, Left, Right):
-                if self.is_legal_move(n, d):
+                if self.is_legal_shift(n, d):
                     lm.append((n, d))
     return lm
 
@@ -168,7 +168,7 @@ def add_drop(self, x, y):
         raise Exception(str((x, y))+" is not a legal move")
 
 
-def add_move(self, n, d):
+def add_shift(self, n, d):
     """
     Adds a stage of a turn: move n pieces in the given direction.
     If the move is legal, the pieces are moved and the game state is updated.
@@ -182,7 +182,7 @@ def add_move(self, n, d):
 
     Raises: Exception if the move is not legal
     """
-    if self.is_legal_move(n, d):
+    if self.is_legal_shift(n, d):
         x, y = self.curr_square
         self.board[x][y] = self.board[x][y][:-n]
         # If there was no piece left at the previous square,
@@ -251,7 +251,7 @@ def add_turn(self, turn):
     """
     self.add_drop(*turn[0])
     for move in turn[1:]:
-        self.add_move(*move)
+        self.add_shift(*move)
         if self.curr_turn_end == True and len(turn) > len(self.curr_turn):
-            raise Exception(f"Invalid turn #{len(log)}, end flag raised")
+            raise Exception(f"Invalid turn #{len(self.log)}, end flag raised")
     self.end_turn()
