@@ -1,12 +1,3 @@
-const switches = document.querySelectorAll(".switch");
-let activeSwitch = document.querySelector(".switch.active");
-const squares = document.querySelectorAll(".square");
-const outputTextarea = document.querySelector(".output");
-const outputTextarea2 = document.querySelector(".output2");
-let x = 0;
-let y = 0;
-let color = 0;
-
 //Constants
 const Player = Object.freeze({ White: false, Black: true });
 const Direction = Object.freeze({ Up: [-1, 0], Down: [1, 0], Left: [-1, 0], Right: [1, 0] });
@@ -31,22 +22,17 @@ function indexToCoord(i) {
   return [Math.floor(i / 6), i % 6];
 }
 
-// // Add click event listener to switches
-// switches.forEach((switchElement) => {
-//   switchElement.addEventListener("click", () => {
-//     if (activeSwitch) {
-//       activeSwitch.classList.remove("active");
-//     }
-//     activeSwitch = switchElement;
-//     activeSwitch.classList.add("active");
-//     if (activeSwitch.classList.contains("light")) {
-//       color = 0;
-//     } else if (activeSwitch.classList.contains("dark")) {
-//       color = 1;
-//     }
-//     console.log(color);
-//   });
-// });
+/**
+ * Changes the active switch and its corresponding color.
+ */
+function changeSwitch() {
+  const activeSwitch = document.querySelector(".switch.active");
+  const inactiveSwitch = document.querySelector(`.switch.circle.${activeSwitch.classList.contains("light") ? "dark" : "light"}`);
+
+  // Remove the "active" class from the currently active switch and add it to the inactive switch
+  activeSwitch.classList.remove("active");
+  inactiveSwitch.classList.add("active");
+}
 
 // Remove all child elements from squares
 /**
@@ -58,83 +44,8 @@ function removeAllPieces() {
   });
 }
 
-const removeAllButton = document.getElementById("remove-all");
-removeAllButton.addEventListener("click", removeAllPieces);
-
-/**
- * Returns the current state of the game board as a string.
- *
- * @param {NodeList} squares - The squares of the game board.
- * @returns {string} - The current state of the board as a string.
- */
-function getBoardState(squares) {
-  let text = "";
-  squares.forEach((squareElement, index) => {
-    let [x, y] = indexToCoord(index);
-    for (let i = 0; i < squareElement.children.length; i++) {
-      const child = squareElement.children[i];
-      if (child.classList.contains("dark")) {
-        text += "1";
-      } else if (child.classList.contains("light")) {
-        text += "0";
-      }
-    }
-    text += "/";
-  });
-  return text;
-}
-
-/**
- * Adds a piece to the specified square when clicked, as long as the square is not already full.
- *
- * @param {Node} square - The square onto which a piece should be added.
- */
-function addPieceOnClick(square) {
-  // Check if the square has less than 4 child elements
-  if (square.children.length < 4) {
-    // Create a new div element with the classes .child, .oval, and .light or .dark depending on the value of the color variable
-    const newDiv = document.createElement("div");
-    newDiv.classList.add("child", "oval", color ? "dark" : "light");
-    // Append the new div element to the clicked square
-    square.appendChild(newDiv);
-  }
-}
-
-// Loop through each square element and add a click event listener
-// squares.forEach((square) => {
-//   square.addEventListener("click", () => {
-//     // Call the addPieceOnClick function with the clicked square element as the argument
-//     addPieceOnClick(square);
-//     // Update the value of the outputTextarea element with the current state of the board
-//     outputTextarea.value = getBoardState(squares);
-//   });
-// });
-
-/**
- * Sets the board state based on the input text in outputTextarea.
- */
-function setBoardState() {
-  // split the input value at each "/" character
-  const values = outputTextarea.value.trim().split("/");
-  // clear the contents of all the squares
-  removeAllPieces();
-  squares.forEach((squareElement, index) => {
-    // loop through each character in the corresponding values array
-    for (let i = 0; i < values[index].length; i++) {
-      // create a new div element with the appropriate class based on the character value
-      const child = document.createElement("div");
-      if (values[index][i] === "1") {
-        child.classList.add("child", "oval", "dark");
-      } else if (values[index][i] === "0") {
-        child.classList.add("child", "oval", "light");
-      }
-      // append the new div element to the square element
-      squareElement.appendChild(child);
-    }
-  });
-}
-
-outputTextarea.addEventListener("input", setBoardState);
+// const removeAllButton = document.getElementById("remove-all");
+// removeAllButton.addEventListener("click", removeAllPieces);
 
 // /**
 //  * Removes a piece from the specified square.
@@ -184,8 +95,8 @@ function drawBoard(board) {
   removeAllPieces();
 
   // loop through each position on the board
-  for (let x = 0; x < board.length; x++) {
-    for (let y = 0; y < board[x].length; y++) {
+  for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < 6; y++) {
       for (let z = 0; z < board[x][y].length; z++) {
         drawPiece(x, y, board[x][y][z]);
       }
@@ -203,13 +114,13 @@ function drawBoard(board) {
 function drawPiece(x, y, color) {
   // find the corresponding square element and create a new oval element
   const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
-  const oval = document.createElement("div");
+  const piece = document.createElement("div");
 
-  // add classes to the oval element for styling
-  oval.classList.add("child", "oval", color ? "dark" : "light");
+  // add classes to the piece element for styling
+  piece.classList.add("child", "oval", `${color ? "dark" : "light"}`);
 
-  // add the oval element to the square element
-  square.appendChild(oval);
+  // add the piece element to the square element
+  square.appendChild(piece);
 }
 
 /**
@@ -219,6 +130,7 @@ function removeSquareEventListeners() {
   const squares = document.querySelectorAll(".square");
   // clone each square and replace the original with the clone
   squares.forEach((squareElement) => {
+    squareElement.classList.remove("legal");
     const clonedSquare = squareElement.cloneNode(true);
     squareElement.parentNode.replaceChild(clonedSquare, squareElement);
   });
@@ -252,11 +164,13 @@ function addDropEventListeners(game) {
     let [x, y] = indexToCoord(index);
 
     if (game.isLegalDrop(x, y)) {
+      squareElement.classList.add("legal");
       squareElement.addEventListener('click', (event) => {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
         resetEventListeners(game);
         activateEndTurnButton(game);
+        activateUndoMoveButton(game);
       });
     }
   });
@@ -304,6 +218,7 @@ function addOrthogonalEventListeners(game, n) {
   for (const [dx, dy] of directions) {
     if (game.isLegalShift(n, [dx, dy])) {
       const square = squares[coordToIndex(x + dx, y + dy)];
+      square.classList.add("legal");
       square.addEventListener('click', (event) => {
         removeShiftEventListeners(x, y);
         game.addShift(n, [dx, dy]);
@@ -341,7 +256,8 @@ function resetEventListeners(game) {
  *
  */
 function deactivateEndTurnButton() {
-  endTurnButton = document.getElementById('endturn');
+  endTurnButton = document.getElementById('endTurn');
+  endTurnButton.classList.remove("active");
   buttonCopy = endTurnButton.cloneNode(true);
   endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
 }
@@ -355,14 +271,48 @@ function deactivateEndTurnButton() {
  * @param {Game} game - The game object.
  */
 function activateEndTurnButton(game) {
-  endTurnButton = document.getElementById('endturn');
+  endTurnButton = document.getElementById('endTurn');
+  endTurnButton.classList.add("active");
   endTurnButton.addEventListener('click', () => {
+    console.log("EndTurn button clicked")
     game.endTurn();
-    removeShiftEventListeners();
     removeSquareEventListeners();
-    addClickEventListeners();
+    resetEventListeners(game);
     deactivateEndTurnButton();
+    deactivateUndoMoveButton();
+    changeSwitch();
   })
+}
+
+/**
+ * Adds an event listener to the undo move button that calls the undoMove method on the given game object.
+ *
+ * @param {Game} game - The game object.
+ */
+function activateUndoMoveButton(game) {
+  UndoMoveButton = document.getElementById('undoMove');
+  UndoMoveButton.classList.add("active");
+  UndoMoveButton.addEventListener('click', () => {
+    console.log("Undo Move");
+    game.undoMove();
+    if (game.activeTurn.length == 0) {
+      deactivateUndoMoveButton();
+      deactivateEndTurnButton();
+
+    }
+    drawBoard(game.activeBoard);
+    resetEventListeners(game);
+  })
+}
+
+/**
+ * Removes the active class from the undo move button.
+ */
+function deactivateUndoMoveButton() {
+  UndoMoveButton = document.getElementById('undoMove');
+  UndoMoveButton.classList.remove("active");
+  buttonCopy = UndoMoveButton.cloneNode(true);
+  UndoMoveButton.parentNode.replaceChild(buttonCopy, UndoMoveButton)
 }
 
 
@@ -403,7 +353,7 @@ class Game {
    */
   isLegalDrop(x, y) {
     var tower = this.activeBoard[x][y];
-    return (tower.length === 0 || (tower.length < 4 && tower.slice(-1)[0] === this.activePlayer));
+    return (tower.length === 0 || (tower.length < 4 && tower[tower.length - 1] === this.activePlayer));
   }
 
   /**
@@ -454,12 +404,12 @@ class Game {
     if (this.activeBoard[nx][ny].length + n > this.activeBoard[x][y].length) {
       return false;
     }
-    //Fail case: new position has already happened this turn
+    // Fail case: new position has already happened this turn
     this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
-    this.activeBoard[nx][ny] = this.activeBoard.concat(pile);
-    var s = JSON.stringify(this.activeBoard);
-    this.activeBoard[nx][ny] = this.activeBoard[x][y].slice(0, -n);
-    this.activeBoard[x][y] = this.activeBoard.concat(pile);
+    this.activeBoard[nx][ny] = this.activeBoard[nx][ny].concat(Array(n).fill(this.activePlayer));
+    let s = JSON.stringify(this.activeBoard);
+    this.activeBoard[nx][ny] = this.activeBoard[nx][ny].slice(0, -n);
+    this.activeBoard[x][y] = this.activeBoard[x][y].concat(Array(n).fill(this.activePlayer));
     if (this.activeBoards.includes(s)) {
       return false;
     }
@@ -475,7 +425,7 @@ class Game {
    * @returns {boolean} - true if the shift is legal, false otherwise
    */
   addShift(n, d) {
-    if (isLegalShift(n, d)) {
+    if (this.isLegalShift(n, d)) {
       var [x, y] = this.activeSquare;
       this.activeBoard[x][y] = this.activeBoard[x][y].slice(0, -n);
       //If there was no piece left at the previous square,
@@ -487,7 +437,7 @@ class Game {
       [x, y] = [x + d[0], y + d[1]];
       this.activeBoard[x][y] = this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
       this.activeSquare = [x, y];
-      this.activeTurn.push([x, y]);
+      this.activeTurn.push([n, d]);
       this.activeBoards.push(JSON.stringify(this.activeBoard));
       return true;
     }
@@ -503,12 +453,15 @@ class Game {
       this.resetTurn();
     } else {
       //Else, undo the last shift
-      var [x, y] = this.activeSquare;
-      var [n, d] = this.activeTurn.pop();
-      this.activeBoard[x][y] = this.activeBoard[x][y].slice(-n);
+      let [x, y] = this.activeSquare;
+      // Get the number of pieces and direction of the last shift
+      const [n, d] = this.activeTurn.pop();
+      const removedPieces = this.activeBoard[x][y].splice(-n);
       this.state = State.Shift;
-      [x, y] = [x - d[0], x - d[1]];
-      this.activeBoard[x][y].concat(new Array(n).fill(this.activePlayer));
+      // Get the coordinates of the previous square
+      [x, y] = [x - d[0], y - d[1]];
+      // Add the removed pieces back to the previous square
+      this.activeBoard[x][y] = this.activeBoard[x][y].concat(removedPieces);
       this.activeSquare = [x, y];
       this.activeBoards.pop();
     }
@@ -525,31 +478,132 @@ class Game {
   }
 
   /**
-   * Checks for the winner
+   * Determines the winner of the game by checking if a player controls all active corners.
    *
-   * @returns {Player} - the colour of the winner, or nothing if there is no winner
+   * @returns {boolean} The color of the winning player, or null if there is no winner.
    */
   winner() {
-    const corners = [[0, 0], [0, 5], [5, 0], [5, 5]]
-    var endGame = true;
-    var tops;
-    for (const [x, y] of corners) {
-      if (this.activeBoard[x][y].length === 0) {
-        endGame = false;
-        break;
-      } else if (this.activeBoard[x][y].length === 4) {
+    const corners = [[0, 0], [0, 5], [5, 0], [5, 5]];
+    const tops = [];
+    for (const corner of corners) {
+      const [x, y] = corner;
+      if (board[x][y].length === 0) {
+        // If one of the corners is empty, return null
+        return null;
+      } else if (board[x][y].length === 4) {
+        // If the corner has four pieces, continue to the next corner
         continue;
       } else {
-        let p = this.activeBoard[x][y].slice(-1)[0];
-        if (tops.contains(!p)) {
-          endGame = false;
-          break;
-        }
+        // If the corner is active, add the color of the owner to the tops array
+        const p = board[x][y][board[x][y].length - 1];
         tops.push(p);
       }
     }
-    if (endGame) {
+    // If all elements in the tops array are the same, return the winner
+    if (tops.every((x) => x === tops[0])) {
       return tops[0];
+    } else {
+      // If the top pieces are of different colors, return null
+      return null;
     }
   }
 }
+
+/**
+ * Debug class for debugging the game.
+ *
+ * @param {Game} game An instance of the Game class.
+ */
+class Debug {
+  constructor(game) {
+    this.game = game;
+
+    // Show the debug card
+    const debugDiv = document.getElementById("debug");
+    debugDiv.style.display = "block";
+
+    this.BoardStateOutput = document.querySelector("#BoardStateOutput");
+    this.stateOutput = document.querySelector("#stateOutput");
+    this.playerOutput = document.querySelector("#playerOutput");
+    this.activeTurnEndOutput = document.querySelector("#activeTurnEndOutput");
+    this.activeTurnOutput = document.querySelector("#activeTurnOutput");
+  }
+
+  /**
+   * Get the state of the board.
+   *
+   * @returns {string} A string representing the state of the board.
+   */
+  getBoardState() {
+    let text = "";
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        for (let z = 0; z < this.game.activeBoard[x][y].length; z++) {
+          let piece = this.game.activeBoard[x][y][z];
+          text += Number(piece);
+        }
+        text += "/"
+      }
+    }
+    return text;
+  }
+
+  /**
+   * Sets the state of the board based on the input string.
+   *
+   * @param {string} text - The input string containing the state of the board.
+   */
+  setBoardState(text) {
+    this.game = new Game();
+    this.game.resetTurn();
+    const values = text.trim().split("/");
+    for (let i = 0; i < values.length; i++) {
+      const [x, y] = indexToCoord(i);
+      for (let j = 0; j < values[i].length; j++) {
+        const piece = values[i][j] == 1 ? true : false;
+        this.game.activeBoard[x][y].push(piece);
+      }
+    }
+    drawBoard(this.game.activeBoard)
+    resetEventListeners(this.game);
+  }
+
+  /**
+   * Log the state of the board to the console at regular intervals.
+   *
+   * @param {number} time The interval in milliseconds.
+   */
+  logBoardState(time) {
+    setInterval(() => {
+      const boardState = this.getBoardState();
+      this.BoardStateOutput.value = boardState;
+      console.log(boardState);
+
+      stateOutput.textContent = `State: ${this.game.state}`;
+      playerOutput.textContent = `Active Player: ${this.game.activePlayer}`;
+      activeTurnEndOutput.textContent = `Active Turn End: ${this.game.activeTurnEnd}`;
+      activeTurnOutput.textContent = `Active Turn: ${this.game.activeTurn}`;
+    }, time);
+  }
+
+  /**
+   * Adds an event listener to the Load Board button.
+   *
+   * When the button is clicked, the board state is set to the value of the outputTextarea element.
+   */
+  addLoadBoardListener() {
+    const loadBoardButton = document.querySelector("#loadBoard");
+    loadBoardButton.addEventListener("click", () => {
+      const BoardStateInput = document.querySelector("#BoardStateInput");
+      this.setBoardState(BoardStateInput.value);
+    });
+  }
+
+}
+
+g = new Game();
+resetEventListeners(g);
+
+debug = new Debug(g);
+debug.logBoardState(1000);
+debug.addLoadBoardListener();
