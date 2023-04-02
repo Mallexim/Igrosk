@@ -517,6 +517,10 @@ class Game {
 class Debug {
   constructor(game) {
     this.game = game;
+
+    // Show the debug card
+    const debugDiv = document.getElementById("debug");
+    debugDiv.style.display = "block";
   }
 
   /**
@@ -565,8 +569,8 @@ class Debug {
    */
   logBoardState(time) {
     setInterval(() => {
-      const boardState = this.getBoardState();
-      console.log(boardState);
+      const BoardStateOutput = document.querySelector("#BoardStateOutput");
+      BoardStateOutput.value = this.getBoardState();
     }, time);
   }
 
@@ -578,8 +582,8 @@ class Debug {
   addLoadBoardListener() {
     const loadBoardButton = document.querySelector("#loadBoard");
     loadBoardButton.addEventListener("click", () => {
-      const outputTextarea = document.querySelector(".output");
-      this.setBoardState(outputTextarea.value);
+      const BoardStateInput = document.querySelector("#BoardStateInput");
+      this.setBoardState(BoardStateInput.value);
     });
   }
 
