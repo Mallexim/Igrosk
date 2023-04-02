@@ -8,28 +8,28 @@ body {
   --diameter-board: min(85vw, 85vh);
   --diameter-tile: calc(1 / 6 * var(--diameter-board));
   --edge-width: calc((min(100vw, 100vh) - var(--diameter-board)) * 0.2);
-  --color-danger: tomato;
-  --color-success: #1d83e0;
   --color-white: #f0f0f0;
   --color-black: #222;
+  --color-accent: #8B4513;
+  --color-danger: tomato;
+  --color-select: #94b2d1;
   --color-board-hue: 30;
   --color-board-sat: 40%;
-  --color-shadow: hsl(
+  --color-shadow: hsl( /* #B3804D */
     var(--color-board-hue),
     var(--color-board-sat),
     50%
-  ); /* #B3804D */
-  --color-shadow-lighter: hsl(
+  ); 
+  --color-shadow-lighter: hsl( /*   #BA8C5E */
     var(--color-board-hue),
     var(--color-board-sat),
     55%
-  ); /*   #BA8C5E */
+  );
   --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
   --color-background: var(--color-shadow-lighter);
 }
 
 .bcontainer {
-/*   display: block; */
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -47,18 +47,11 @@ body {
   gap: 40px 30px;
   margin: auto;
   background: var(--color-shadow-lighter); /*   #BA8C5E */
-  /*   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow); */
-  /*   height: var(--diameter-board); */
-/* margin: calc((100vh - var(--diameter-board)) * 0.5) */
-/* calc((100vw - var(--diameter-board)) * 0.5); */
-/*   position: relative; */
-  /*   width: var(--diameter-board); */
 }
 
 .chess-board {
   width: var(--diameter-board);
   height: 100%;
-  /* max-width: 650px; adjust as needed */
   background: var(--color-shadow-lighter); /*   #BA8C5E */
   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow);
     margin:  auto;
@@ -78,7 +71,7 @@ aside {
 }
 aside div {
   align-items: center;
-  color: white;
+  color: var(--color-white);
   display: flex;
 }
 aside div > * {
@@ -133,7 +126,7 @@ aside div svg {
 }
 
 .switch.circle.active {
-  border: 1px solid #94b2d1;
+  border: 1px solid var(--color-select);
 }
 
 .row {
@@ -177,12 +170,12 @@ aside div svg {
 }
 
 .light {
-  background: #f0f0f0;
+  background: var(--color-white);
   border: 1px solid var(--color-shadow);
 }
 
 .dark {
-  background: #222;
+  background: var(--color-black);
   border: 1px solid var(--color-shadow);
 }
 
@@ -234,7 +227,7 @@ aside div svg {
 }
 
 .white {
-  color: #f0f0f0;
+  color: var(--color-white);
 }
 
 svg {
@@ -251,7 +244,7 @@ svg.black {
 }
 
 input {
-  border: 1px solid black;
+  border: 1px solid var(--color-black);
   border-radius: 5px;
   padding: 10px;
   margin: 2px;
@@ -269,14 +262,14 @@ input {
   background: var(--color-shadow);
   padding: 10px;
   border-radius: 10px;
-  border: 1px solid #222;
+  border: 1px solid var(--color-black);
 }
 
 button {
-  background-color: #8B4513;
+  background-color: var(--color-accent);
   border: 1px solid var(--color-white);
   border-radius: 5px;
-  color: white;
+  color: var(--color-white);
   padding: 10px 20px;
   text-align: center;
   text-decoration: none;
@@ -289,6 +282,11 @@ button {
 button:not(.active) {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+a:link,
+a:visited {
+  color: #8B4513;
 }
 
 @media all and (max-width: 851px) {
@@ -304,6 +302,8 @@ button:not(.active) {
   
   .ccontainer {
   flex-direction: row;
+  /* justify-content: space-evenly; */
+  align-items: center;  
 }
   
 }
