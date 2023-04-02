@@ -131,6 +131,7 @@ function removeSquareEventListeners() {
   // clone each square and replace the original with the clone
   squares.forEach((squareElement) => {
     squareElement.classList.remove("legal");
+    squareElement.classList.remove("active");
     const clonedSquare = squareElement.cloneNode(true);
     squareElement.parentNode.replaceChild(clonedSquare, squareElement);
   });
@@ -184,8 +185,9 @@ function addDropEventListeners(game) {
    */
 function addShiftEventtListeners(game) {
   var [x, y] = game.activeSquare;
-  const squares = document.querySelectorAll(".square");
-  const pieceElements = squares[coordToIndex(x, y)].querySelectorAll(
+  const square = document.querySelectorAll(".square")[coordToIndex(x, y)];
+  square.classList.add("active");
+  const pieceElements = square.querySelectorAll(
     ".child"
   );
   var tower = game.activeBoard[x][y];
