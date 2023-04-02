@@ -521,6 +521,12 @@ class Debug {
     // Show the debug card
     const debugDiv = document.getElementById("debug");
     debugDiv.style.display = "block";
+
+    this.BoardStateOutput = document.querySelector("#BoardStateOutput");
+    this.stateOutput = document.querySelector("#stateOutput");
+    this.playerOutput = document.querySelector("#playerOutput");
+    this.activeTurnEndOutput = document.querySelector("#activeTurnEndOutput");
+    this.activeTurnOutput = document.querySelector("#activeTurnOutput");
   }
 
   /**
@@ -569,8 +575,14 @@ class Debug {
    */
   logBoardState(time) {
     setInterval(() => {
-      const BoardStateOutput = document.querySelector("#BoardStateOutput");
-      BoardStateOutput.value = this.getBoardState();
+      const boardState = this.getBoardState();
+      this.BoardStateOutput.value = boardState;
+      console.log(boardState);
+
+      stateOutput.textContent = `State: ${this.game.state}`;
+      playerOutput.textContent = `Active Player: ${this.game.activePlayer}`;
+      activeTurnEndOutput.textContent = `Active Turn End: ${this.game.activeTurnEnd}`;
+      activeTurnOutput.textContent = `Active Turn: ${this.game.activeTurn}`;
     }, time);
   }
 
