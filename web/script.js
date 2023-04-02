@@ -239,6 +239,8 @@ function resetEventListeners(game) {
   removeSquareEventListeners();
   switch (game.state) {
     case State.Drop:
+      deactivateUndoMoveButton();
+      deactivateEndTurnButton();
       addDropEventListeners(game);
       break;
     case State.Shift:
@@ -278,8 +280,6 @@ function activateEndTurnButton(game) {
     game.endTurn();
     removeSquareEventListeners();
     resetEventListeners(game);
-    deactivateEndTurnButton();
-    deactivateUndoMoveButton();
     changeSwitch();
   })
 }
@@ -295,11 +295,6 @@ function activateUndoMoveButton(game) {
   UndoMoveButton.addEventListener('click', () => {
     console.log("Undo Move");
     game.undoMove();
-    if (game.activeTurn.length == 0) {
-      deactivateUndoMoveButton();
-      deactivateEndTurnButton();
-
-    }
     drawBoard(game.activeBoard);
     resetEventListeners(game);
   })
