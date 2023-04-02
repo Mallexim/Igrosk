@@ -40,10 +40,12 @@ body {
 .container {
   display: flex;
   flex-wrap: wrap;
+  width: 95%;
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
   gap: 40px 30px;
+  margin: auto;
   background: var(--color-shadow-lighter); /*   #BA8C5E */
   /*   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow); */
   /*   height: var(--diameter-board); */
@@ -54,12 +56,12 @@ body {
 }
 
 .chess-board {
-  width: 100%;
+  width: min(90vw, 90vh);
   height: 100%;
-  max-width: 600px; /* adjust as needed */
+  max-width: 650px; /* adjust as needed */
   background: var(--color-shadow-lighter); /*   #BA8C5E */
   box-shadow: 0 0 0 calc(var(--border-width) * 3) var(--color-shadow-lighter), 0 0 0 var(--edge-width) var(--color-shadow);
-    margin: 0 auto;
+    margin:  auto;
 }
 
 aside {
@@ -69,8 +71,8 @@ aside {
 /*     position: absolute; */
   top: calc(var(--edge-width) * -0.55);
   transform: translateY(-40%);
-  width: 100%;
-  max-width:600px;
+  width: min(90vw, 90vh);
+  max-width:650px;
   z-index: 999;
   margin: 0 auto;
 }
@@ -289,7 +291,7 @@ button:not(.active) {
   cursor: not-allowed;
 }
 
-@media all and (max-width: 700px) {
+@media all and (max-width: 851px) {
   .container, .bcontainer {
     /* On small screens, we are no longer using row direction but column */
     flex-direction: column;

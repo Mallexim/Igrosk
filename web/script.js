@@ -353,7 +353,7 @@ class Game {
    */
   isLegalDrop(x, y) {
     var tower = this.activeBoard[x][y];
-    return (tower.length === 0 || (tower.length < 4 && tower.slice(-1)[0] === this.activePlayer));
+    return (tower.length === 0 || (tower.length < 4 && tower[tower.length - 1] === this.activePlayer));
   }
 
   /**
