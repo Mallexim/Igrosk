@@ -337,7 +337,6 @@ class Game {
     this.activeTurn = [];
     this.activeSquare = null;
     this.activeBoards = [this.activeBoards[0]];
-    this.activeTurnEnd = false;
     this.activeBoard = JSON.parse(this.activeBoards[0]);
   }
 
@@ -522,7 +521,6 @@ class Debug {
     this.BoardStateOutput = document.querySelector("#BoardStateOutput");
     this.stateOutput = document.querySelector("#stateOutput");
     this.playerOutput = document.querySelector("#playerOutput");
-    this.activeTurnEndOutput = document.querySelector("#activeTurnEndOutput");
     this.activeTurnOutput = document.querySelector("#activeTurnOutput");
   }
 
@@ -578,7 +576,6 @@ class Debug {
 
       stateOutput.textContent = `State: ${this.game.state}`;
       playerOutput.textContent = `Active Player: ${this.game.activePlayer}`;
-      activeTurnEndOutput.textContent = `Active Turn End: ${this.game.activeTurnEnd}`;
       activeTurnOutput.textContent = `Active Turn: ${this.game.activeTurn}`;
     }, time);
   }
