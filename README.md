@@ -1,6 +1,6 @@
 # Igrosk
 
-This is our repo for a new games
+You can find the latest playable version [here](https://htmlpreview.github.io/?https://github.com/Mallexim/Igrosk/blob/main/web/index.html).
 
 ## Rules
 
