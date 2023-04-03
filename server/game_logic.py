@@ -38,9 +38,6 @@ class Game:
         for turn in log:
             self.add_turn(turn)
 
-        # Websocket addresses for players
-        self.white_ws = None
-        self.black_ws = None
 
     def reset_turn(self, reset_board=True):
         """

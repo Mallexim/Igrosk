@@ -6,18 +6,28 @@ import game_logic
 
 
 app = FastAPI()
-games = {}
+
+rooms = {}
 game = game_logic.Game()
 
+class Room:
+    def __init__(self, room_id):
+        self.room_id = room_id
+        self.game = game_logic.Game()
+
+        # Websocket addresses for players
+        self.white_ws = None
+        self.black_ws = None
+
 @app.websocket("/game/{game_id}/{player_id}")
-async def ws_endpoint(websocket: WebSocket, game_id: str, player_id: str):
+async def ws_endpoint(websocket: WebSocket, room_id: str, player_id: str):
     await websocket.accept()
-    if game_id not in games:
-        games[game_id] = game_logic.Game()
+    if room_id not in rooms:
+        rooms[room_id] = game_logic.Game()
     if player_id == 'white':
-        games[game_id].white_ws = websocket
+        rooms[room_id].white_ws = websocket
     else:
-        games[game_id].black_ws = websocket
+        rooms[room_id].black_ws = websocket
 
 @app.get('/board')
 async def board():
