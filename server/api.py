@@ -1,11 +1,23 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
+from fastapi.responses import HTMLResponse
+
 from typing import List, Tuple
 import game_logic
 
 
 app = FastAPI()
+games = {}
 game = game_logic.Game()
 
+@app.websocket("/game/{game_id}/{player_id}")
+async def ws_endpoint(websocket: WebSocket, game_id: str, player_id: str):
+    await websocket.accept()
+    if game_id not in games:
+        games[game_id] = game_logic.Game()
+    if player_id == 'white':
+        games[game_id].white_ws = websocket
+    else:
+        games[game_id].black_ws = websocket
 
 @app.get('/board')
 async def board():
