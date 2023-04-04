@@ -50,6 +50,18 @@ class Room(BaseModel):
         else:
             await websocket.close(code=1008)
             return False
+        
+class Drop(BaseModel):
+    x: int
+    y: int
+
+class Shift(BaseModel):
+    pieces: int
+    direction: List[int]
+
+class Turn(BaseModel):
+    drop: Drop
+    shifts: List[Shift]
 
 
 @app.post("/create_room")
