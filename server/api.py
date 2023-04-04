@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+import uuid
 
 from typing import List, Tuple
 import game_logic
@@ -18,6 +19,12 @@ class Room(BaseModel):
     # Websocket addresses for players
     white_ws: WebSocket = None
     black_ws: WebSocket = None
+
+@app.post("/create_room")
+async def create_room(room_id: str):
+    new_room = Room(room_id=room_id, game=game_logic.Game())
+    rooms[room_id] = new_room
+    return {"room_id": room_id, "message": f"Room {room_id} created"}
 
 @app.websocket("/game/{game_id}/{player_id}")
 async def ws_endpoint(websocket: WebSocket, room_id: str, player_id: str):
