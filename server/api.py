@@ -20,6 +20,9 @@ class Room(BaseModel):
     # Websocket addresses for players
     connections: List[WebSocket] = []
 
+    class Config:
+        arbitrary_types_allowed = True
+
     @validator('game')
     def validate_game(cls, v):
         if not isinstance(v, game_logic.Game):
