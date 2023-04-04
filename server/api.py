@@ -40,6 +40,14 @@ async def create_room():
     rooms[room_id] = new_room
     return {"room_id": room_id, "message": f"Room {room_id} created"}
 
+@app.websocket("/room/{room_id}")
+async def join_room(websocket: WebSocket, room_id: str):
+    if room_id in rooms:
+        room = rooms[room_id]
+
+    else:
+        await websocket.close(code=1008)
+
 @app.websocket("/game/{room_id}/{player_id}")
 async def ws_endpoint(websocket: WebSocket, room_id: str, player_id: str):
     await websocket.accept()
