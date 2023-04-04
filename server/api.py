@@ -21,7 +21,8 @@ class Room(BaseModel):
     black_ws: WebSocket = None
 
 @app.post("/create_room")
-async def create_room(room_id: str):
+async def create_room():
+    room_id = str(uuid.uuid4())[:8]
     new_room = Room(room_id=room_id, game=game_logic.Game())
     rooms[room_id] = new_room
     return {"room_id": room_id, "message": f"Room {room_id} created"}
