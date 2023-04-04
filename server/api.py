@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 import uuid
 
 from typing import List, Tuple
@@ -19,6 +19,12 @@ class Room(BaseModel):
 
     # Websocket addresses for players
     connections: List[WebSocket] = []
+
+    @validator('game')
+    def validate_game(cls, v):
+        if not isinstance(v, game_logic.Game):
+            raise ValueError('Value must be an instance of game_logic.Game')
+        return v
 
     async def broadcast(self, message: str):
         # Method for broadcasting data to players
@@ -60,7 +66,6 @@ async def join_room(websocket: WebSocket, room_id: str):
                 room.connections.remove(websocket)
     else:
         await websocket.close(code=1008)
-
 
 # @app.get('/board')
 # async def board():
