@@ -67,6 +67,10 @@ async def join_room(websocket: WebSocket, room_id: str):
     else:
         await websocket.close(code=1008)
 
+@app.get("/test")
+def hello():
+    return {"message": "Hello, World!"}
+
 # @app.get('/board')
 # async def board():
 #     return {'board': game.board}
