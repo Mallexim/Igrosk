@@ -17,8 +17,21 @@ class Room(BaseModel):
     game: game_logic.Game
 
     # Websocket addresses for players
-    white_ws: WebSocket = None
-    black_ws: WebSocket = None
+    connections: List[WebSocket] = []
+
+    async def broadcast(self, message: str):
+        # Method for broadcasting data to players
+        for connection in self.connections:
+            await connection.send_text(message) 
+
+    async def add_player(self, websocket: WebSocket):
+        if len(self.connections) < 2:
+            self.connections.append(websocket)
+            await websocket.accept()
+            return True
+        else:
+            await websocket.close(code=1008)
+            return False
 
 @app.post("/create_room")
 async def create_room():
@@ -27,7 +40,7 @@ async def create_room():
     rooms[room_id] = new_room
     return {"room_id": room_id, "message": f"Room {room_id} created"}
 
-@app.websocket("/game/{game_id}/{player_id}")
+@app.websocket("/game/{room_id}/{player_id}")
 async def ws_endpoint(websocket: WebSocket, room_id: str, player_id: str):
     await websocket.accept()
     if room_id not in rooms:
