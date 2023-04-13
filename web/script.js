@@ -593,5 +593,5 @@ function startGame() {
   resetEventListeners(g);
   debug.logBoardState(1000);
   debug.addLoadBoardListener();
-  document.getElementById("startBtn").disabled = true;
+  deactivateButton("startGame");
 }
