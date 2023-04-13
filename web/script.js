@@ -626,6 +626,8 @@ function sendTurn(socket, turn) {
 // const socket = joinRoom(serverAddress, roomId, handleOpen, handleMessage, handleClose);
 // eg. const socket = joinRoom('ws://localhost:8000', "0a8899a8", handleOpen, handleMessage, handleClose);
 
+let g = null;
+
 /**
  * Initializes a new game object and sets up event listeners.
  */
