@@ -34,7 +34,6 @@ function changeSwitch() {
   inactiveSwitch.classList.add("active");
 }
 
-// Remove all child elements from squares
 /**
  * Removes all pieces from the game board.
  */
@@ -43,45 +42,6 @@ function removeAllPieces() {
     square.innerHTML = "";
   });
 }
-
-// const removeAllButton = document.getElementById("remove-all");
-// removeAllButton.addEventListener("click", removeAllPieces);
-
-// /**
-//  * Removes a piece from the specified square.
-//  *
-//  * @param {number} row - The row containing the piece to be removed.
-//  * @param {number} col - The column containing the piece to be removed.
-//  */
-// function removePiece(row, col) {
-//   const square = squares[coordToIndex(row, col)];
-
-//   // Check if the square has any child elements
-//   if (square.children.length > 0) {
-//     // Remove the last child element from the square
-//     square.removeChild(square.lastChild);
-//   }
-// }
-
-// Add click event listener to test button
-// const testButton = document.querySelector(".test");
-// testButton.addEventListener("click", () => {
-//   // console.log([x, y]);
-//   outputTextarea2.value = [x, y, color];
-//   drawPiece(x, y, color);
-// });
-
-// const deletePieceButton = document.querySelector(".deletePiece");
-// const deletePieceText = document.querySelector(".deletePieceText");
-// deletePieceButton.addEventListener("click", () => {
-//   const coordinates = deletePieceText.value.trim().split(",");
-//   if (coordinates.length === 2) {
-//     let row = parseInt(coordinates[0]);
-//     let col = parseInt(coordinates[1]);
-//     console.log(`x: ${row}, y: ${col}`);
-//     removePiece(row, col);
-//   }
-// });
 
 
 /**
