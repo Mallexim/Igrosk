@@ -10,7 +10,7 @@ import game_logic
 
 
 app = FastAPI()
-
+ 
 rooms = {}
 
 app.add_middleware(
@@ -44,6 +44,10 @@ class Room(BaseModel):
         for connection in self.connections:
             # Send data to each player as a JSON string
             await connection.send_text(json.dumps(data))
+
+    async def send_to_player(self, data: str, player: WebSocket):
+        # Method for sending data to a player as JSON
+        await player.send_text(json.dumps(data))
 
     async def add_player(self, websocket: WebSocket):
         # Method for adding a player to the game
