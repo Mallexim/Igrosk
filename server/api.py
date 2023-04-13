@@ -97,6 +97,10 @@ async def join_room(websocket: WebSocket, room_id: str):
 def hello():
     return {"message": "Hello, World!"}
 
+@app.get("/room")
+async def get_all_rooms():
+    return list(rooms.keys())
+
 # @app.get('/board')
 # async def board():
 #     return {'board': game.board}
