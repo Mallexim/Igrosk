@@ -1,5 +1,4 @@
 from fastapi import FastAPI, WebSocket
-from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 import uuid
@@ -32,25 +31,31 @@ class Room(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    @validator('game')
-    def validate_game(cls, v):
-        if not isinstance(v, game_logic.Game):
-            raise ValueError('Value must be an instance of game_logic.Game')
-        return v
+@validator('game')
+def validate_game(cls, v):
+    # Validator for the 'game' field
+    if not isinstance(v, game_logic.Game):
+        # Raise an error if the value is not an instance of game_logic.Game
+        raise ValueError('Value must be an instance of game_logic.Game')
+    return v
 
-    async def broadcast(self, data: str):
-        # Method for broadcasting data to players as JSON
-        for connection in self.connections:
-            await connection.send_text(json.dumps(data))
+async def broadcast(self, data: str):
+    # Method for broadcasting data to players as JSON
+    for connection in self.connections:
+        # Send data to each player as a JSON string
+        await connection.send_text(json.dumps(data))
 
-    async def add_player(self, websocket: WebSocket):
-        if len(self.connections) < 2:
-            self.connections.append(websocket)
-            await websocket.accept()
-            return True
-        else:
-            await websocket.close(code=1008)
-            return False
+async def add_player(self, websocket: WebSocket):
+    # Method for adding a player to the game
+    if len(self.connections) < 2:
+        # If there are less than 2 players, add the new player
+        self.connections.append(websocket)
+        await websocket.accept()
+        return True
+    else:
+        # If there are already 2 players, close the connection
+        await websocket.close(code=1008)
+        return False
         
 class Drop(BaseModel):
     x: int
@@ -67,6 +72,16 @@ class Turn(BaseModel):
 
 @app.post("/create_room")
 async def create_room():
+    """
+    Create a new room with a unique ID and game instance.
+
+    This endpoint creates a new room with a unique ID generated using the uuid library. 
+    A new instance of the game_logic.Game class is also created and assigned to the room. 
+    The new room is then added to the 'rooms' dictionary and its ID is returned in the response.
+
+    Returns:
+        dict: A dictionary containing the room ID and a message indicating that the room was created.
+    """
     room_id = str(uuid.uuid4())[:8]
     new_room = Room(room_id=room_id, game=game_logic.Game())
     rooms[room_id] = new_room
@@ -75,6 +90,18 @@ async def create_room():
 
 @app.websocket("/room/{room_id}")
 async def join_room(websocket: WebSocket, room_id: str):
+    """
+    Join a room with the specified ID.
+
+    This endpoint allows a player to join a room with the specified ID using a WebSocket connection. 
+    If the room exists and has less than 2 players, the player is added to the room and can start sending and receiving data. 
+    If the room does not exist or is full, the WebSocket connection is closed.
+
+    Args:
+        websocket (WebSocket): The player's WebSocket connection.
+        room_id (str): The ID of the room to join.
+
+    """
     if room_id in rooms:
         room = rooms[room_id]
         success = await room.add_player(websocket)
@@ -99,6 +126,8 @@ def hello():
 
 @app.get("/room")
 async def get_all_rooms():
+    # Endpoint for getting all room keys
+    # Returns a list of all room keys in the 'rooms' dictionary
     return list(rooms.keys())
 
 # @app.get('/board')
