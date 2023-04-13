@@ -595,9 +595,11 @@ class Debug {
 
 }
 
-g = new Game();
-resetEventListeners(g);
-
-debug = new Debug(g);
-debug.logBoardState(1000);
-debug.addLoadBoardListener();
+function startGame() {
+  g = new Game();
+  debug = new Debug(g);
+  resetEventListeners(g);
+  debug.logBoardState(1000);
+  debug.addLoadBoardListener();
+  document.getElementById("startBtn").disabled = true;
+}
