@@ -604,6 +604,10 @@ async function createRoom(serverAddress) {
   return roomId;
 }
 
+// To get the roomID run:
+// createRoom('http://localhost:8000')
+// .then(roomID => console.log(roomID));
+
 /**
  * Initializes a new game object and sets up event listeners.
  */
