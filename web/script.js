@@ -216,17 +216,20 @@ function resetEventListeners(game) {
 /**
  * Activates the specified button and adds an event listener to it.
  *
- * @param {Object} game - The game object.
  * @param {string} buttonId - The ID of the button to activate.
  * @param {Function} eventListener - The event listener to add to the button.
+ * @param {Object} [game] - The game object (optional).
  */
-function activateButton(game, buttonId, eventListener) {
+function activateButton(buttonId, game, eventListener) {
   const button = document.getElementById(buttonId);
   button.classList.add("active");
   button.addEventListener('click', () => {
     console.log(`${buttonId} button clicked`);
-    eventListener(game);
-    resetEventListeners(game);
+    if (game) {
+      eventListener(game);
+    } else {
+      eventListener();
+    }
   })
 }
 
@@ -241,6 +244,7 @@ function endTurnButtonEventListener(game) {
     game.endTurn();
     removeSquareEventListeners();
     changeSwitch();
+    resetEventListeners(game);
 }
 
 /**
@@ -252,6 +256,7 @@ function endTurnButtonEventListener(game) {
 function undoMoveButtonEventListener(game) {
     game.undoMove();
     drawBoard(game.activeBoard);
+    resetEventListeners(game);
 }
 
 /**
@@ -655,5 +660,4 @@ function startGame() {
   deactivateButton("startGame"); // Disable the start game button
 }
 
-const startGameButton = document.getElementById("startGame");
-startGameButton.addEventListener("click", startGame);
+activateButton("startGame", null, startGame);
