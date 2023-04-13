@@ -170,8 +170,8 @@ function addDropEventListeners(game) {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
         resetEventListeners(game);
-        activateEndTurnButton(game);
-        activateUndoMoveButton(game);
+        activateButton(game, "endTurn", endTurnButtonEventListener);
+        activateButton(game, "undoMove", undoMoveButtonEventListener);
       });
     }
   });
@@ -253,41 +253,44 @@ function resetEventListeners(game) {
   }
 }
 
-
 /**
- * Activates the end turn button.
- * Calls game.endTurn() when the button is clicked.
- * Removes all shift and square event listeners and adds click event listeners.
- * Deactivates the end turn button after it has been clicked.
+ * Activates the specified button and adds an event listener to it.
  *
- * @param {Game} game - The game object.
+ * @param {Object} game - The game object.
+ * @param {string} buttonId - The ID of the button to activate.
+ * @param {Function} eventListener - The event listener to add to the button.
  */
-function activateEndTurnButton(game) {
-  endTurnButton = document.getElementById('endTurn');
-  endTurnButton.classList.add("active");
-  endTurnButton.addEventListener('click', () => {
-    console.log("EndTurn button clicked")
-    game.endTurn();
-    removeSquareEventListeners();
+function activateButton(game, buttonId, eventListener) {
+  const button = document.getElementById(buttonId);
+  button.classList.add("active");
+  button.addEventListener('click', () => {
+    console.log(`${buttonId} button clicked`);
+    eventListener(game);
     resetEventListeners(game);
-    changeSwitch();
   })
 }
 
 /**
- * Adds an event listener to the undo move button that calls the undoMove method on the given game object.
+ * Event listener for the End Turn button.
+ * Ends the current player's turn and switches to the other player.
  *
- * @param {Game} game - The game object.
+ * @param {Object} game - The game object.
  */
-function activateUndoMoveButton(game) {
-  UndoMoveButton = document.getElementById('undoMove');
-  UndoMoveButton.classList.add("active");
-  UndoMoveButton.addEventListener('click', () => {
-    console.log("Undo Move");
+function endTurnButtonEventListener(game) {
+    game.endTurn();
+    removeSquareEventListeners();
+    changeSwitch();
+}
+
+/**
+ * Event listener for the Undo Move button.
+ * Undoes the previous move and redraws the board.
+ *
+ * @param {Object} game - The game object.
+ */
+function undoMoveButtonEventListener(game) {
     game.undoMove();
     drawBoard(game.activeBoard);
-    resetEventListeners(game);
-  })
 }
 
 /**
