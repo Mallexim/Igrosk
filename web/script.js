@@ -585,6 +585,19 @@ function joinRoom(serverAddress, roomId, onMessage, onClose) {
   return socket;
 }
 
+function handleMessage(event) {
+  const message = JSON.parse(event.data);
+  console.log(`Received message: ${message}`);
+}
+
+function handleClose(event) {
+  console.log(`WebSocket connection closed: ${event.code}`);
+}
+
+// This is how you can create a websocket connection 
+// const socket = joinRoom(serverAddress, roomId, handleMessage, handleClose);
+
+
 /**
  * Initializes a new game object and sets up event listeners.
  */
