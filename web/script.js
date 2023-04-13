@@ -599,6 +599,17 @@ function handleClose(event) {
   console.log(`WebSocket connection closed: ${event.code}`);
 }
 
+/**
+ * Send a turn object through a WebSocket connection.
+ *
+ * @param {WebSocket} socket - The WebSocket connection to use.
+ * @param {Object} turn - The turn object to send.
+ */
+function sendTurn(socket, turn) {
+  const message = JSON.stringify(turn);
+  socket.send(message);
+}
+
 // This is how you can create a websocket connection 
 // const socket = joinRoom(serverAddress, roomId, handleOpen, handleMessage, handleClose);
 // eg. const socket = joinRoom('ws://localhost:8000', "0a8899a8", handleOpen, handleMessage, handleClose);
