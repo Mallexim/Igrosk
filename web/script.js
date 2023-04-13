@@ -241,8 +241,8 @@ function resetEventListeners(game) {
   removeSquareEventListeners();
   switch (game.state) {
     case State.Drop:
-      deactivateUndoMoveButton();
-      deactivateEndTurnButton();
+      deactivateButton("undoMove");
+      deactivateButton("endTurn");
       addDropEventListeners(game);
       break;
     case State.Shift:
@@ -253,18 +253,6 @@ function resetEventListeners(game) {
   }
 }
 
-
-/**
- * Deactivates the end turn button.
- * Replaces the current end turn button with a copy of itself to remove event listeners on it.
- *
- */
-function deactivateEndTurnButton() {
-  endTurnButton = document.getElementById('endTurn');
-  endTurnButton.classList.remove("active");
-  buttonCopy = endTurnButton.cloneNode(true);
-  endTurnButton.parentNode.replaceChild(buttonCopy, endTurnButton)
-}
 
 /**
  * Activates the end turn button.
@@ -303,13 +291,14 @@ function activateUndoMoveButton(game) {
 }
 
 /**
- * Removes the active class from the undo move button.
+ * Removes the active class from a specified button.
+ * @param {string} buttonId - The id of the button to deactivate.
  */
-function deactivateUndoMoveButton() {
-  UndoMoveButton = document.getElementById('undoMove');
-  UndoMoveButton.classList.remove("active");
-  buttonCopy = UndoMoveButton.cloneNode(true);
-  UndoMoveButton.parentNode.replaceChild(buttonCopy, UndoMoveButton)
+function deactivateButton(buttonId) {
+  const button = document.getElementById(buttonId);
+  button.classList.remove("active");
+  const buttonCopy = button.cloneNode(true);
+  button.parentNode.replaceChild(buttonCopy, button)
 }
 
 
