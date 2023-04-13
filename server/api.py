@@ -38,7 +38,7 @@ class Room(BaseModel):
             raise ValueError('Value must be an instance of game_logic.Game')
         return v
 
-    async def broadcast(self, data: dict):
+    async def broadcast(self, data: str):
         # Method for broadcasting data to players as JSON
         for connection in self.connections:
             await connection.send_text(json.dumps(data))
@@ -83,7 +83,7 @@ async def join_room(websocket: WebSocket, room_id: str):
                 while True:
                     # Receive data from player's WebSocket connection
                     data = await websocket.receive_text()
-                    print(data)
+                    print(data, type(data))
                     await room.broadcast("This is what the server received: " + data)
                     # Parse data
                     # Update game state
