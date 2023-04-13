@@ -604,13 +604,16 @@ async function createRoom(serverAddress) {
   return roomId;
 }
 
+/**
+ * Initializes a new game object and sets up event listeners.
+ */
 function startGame() {
-  g = new Game();
-  debug = new Debug(g);
-  resetEventListeners(g);
-  debug.logBoardState(1000, g);
-  debug.addLoadBoardListener();
-  deactivateButton("startGame");
+  g = new Game(); // Create a new game object
+  debug = new Debug(g); // Create a new debug object
+  resetEventListeners(g); // Set up event listeners for the game
+  debug.logBoardState(1000, g); // Log the current board state
+  debug.addLoadBoardListener(); // Set up event listener for loading a saved board
+  deactivateButton("startGame"); // Disable the start game button
 }
 
 const startGameButton = document.getElementById("startGame");
