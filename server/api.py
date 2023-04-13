@@ -142,9 +142,10 @@ async def join_room(websocket: WebSocket, room_id: str):
                     # Add the turn to the game
                     room.game.add_turn(turn)
                     print(room.game.board)
-                    await room.broadcast(json.dumps(room.game.board))
-                    room.game.end_turn;
                     # Broadcast new game state to all players in room
+                    await room.broadcast_game_state()
+                    # End turn
+                    room.game.end_turn;
             except:
                 room.connections.remove(websocket)
     else:
