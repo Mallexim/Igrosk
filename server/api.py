@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 import uuid
+import json
 
 from typing import List, Tuple
 import game_logic
@@ -37,10 +38,10 @@ class Room(BaseModel):
             raise ValueError('Value must be an instance of game_logic.Game')
         return v
 
-    async def broadcast(self, message: str):
-        # Method for broadcasting data to players
+    async def broadcast(self, data: str):
+        # Method for broadcasting data to players as JSON
         for connection in self.connections:
-            await connection.send_text(message)
+            await connection.send_text(json.dumps(data))
 
     async def add_player(self, websocket: WebSocket):
         if len(self.connections) < 2:
@@ -82,6 +83,8 @@ async def join_room(websocket: WebSocket, room_id: str):
                 while True:
                     # Receive data from player's WebSocket connection
                     data = await websocket.receive_text()
+                    print(data, type(data))
+                    await room.broadcast("This is what the server received: " + data)
                     # Parse data
                     # Update game state
                     # Broadcast new game state to all players in room
