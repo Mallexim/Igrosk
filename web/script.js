@@ -591,6 +591,19 @@ class Debug {
 
 }
 
+/**
+ * Sends a POST request to the FastAPI endpoint at serverAddress/create_room to create a new room.
+ *
+ * @param {string} serverAddress - The address of the server.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created room.
+ */
+async function createRoom(serverAddress) {
+  const response = await fetch(`${serverAddress}/create_room`, {method: 'POST'});
+  const data = await response.json();
+  const roomId = data.room_id;
+  return roomId;
+}
+
 function startGame() {
   g = new Game();
   debug = new Debug(g);
