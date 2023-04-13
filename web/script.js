@@ -586,15 +586,27 @@ function joinRoom(serverAddress, roomId, onOpen, onMessage, onClose) {
   return socket;
 }
 
+/**
+ * Handles opening of a WebSocket connection.
+ * @param {Event} event - The event object.
+ */
 function handleOpen(event) {
   console.log('WebSocket connection opened', event);
 }
 
+/**
+ * Handles receiving a message through a WebSocket connection.
+ * @param {MessageEvent} event - The event object.
+ */
 function handleMessage(event) {
   const message = JSON.parse(event.data);
   console.log(`Received message: ${message}`);
 }
 
+/**
+ * Handles closing of a WebSocket connection.
+ * @param {CloseEvent} event - The event object.
+ */
 function handleClose(event) {
   console.log(`WebSocket connection closed: ${event.code}`);
 }
