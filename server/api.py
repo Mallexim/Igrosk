@@ -45,6 +45,25 @@ class Room(BaseModel):
             # Send data to each player as a JSON string
             await connection.send_text(data)
 
+    async def broadcast_game_state(self):
+        """
+        Sends the current game state to all connected clients.
+
+        Returns:
+            None
+        """
+        # Create a dictionary containing the game state
+        game_state = {
+            "active_player": self.game.curr_player,
+            "board": self.game.board,
+            "current_turn": self.game.log[-1],
+            "winner": self.game.winner()
+        }
+
+        # Send the game state to all connected clients
+        await self.broadcast(json.dumps(game_state))
+
+
     async def send_to_player(self, data: str, player: WebSocket):
         # Method for sending data to a player as JSON
         await player.send_text(json.dumps(data))
@@ -124,6 +143,7 @@ async def join_room(websocket: WebSocket, room_id: str):
                     room.game.add_turn(turn)
                     print(room.game.board)
                     await room.broadcast(json.dumps(room.game.board))
+                    room.game.end_turn;
                     # Broadcast new game state to all players in room
             except:
                 room.connections.remove(websocket)
