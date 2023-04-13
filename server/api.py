@@ -43,7 +43,7 @@ class Room(BaseModel):
         # Method for broadcasting data to players as JSON
         for connection in self.connections:
             # Send data to each player as a JSON string
-            await connection.send_text(json.dumps(data))
+            await connection.send_text(data)
 
     async def send_to_player(self, data: str, player: WebSocket):
         # Method for sending data to a player as JSON
