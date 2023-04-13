@@ -34,7 +34,6 @@ function changeSwitch() {
   inactiveSwitch.classList.add("active");
 }
 
-// Remove all child elements from squares
 /**
  * Removes all pieces from the game board.
  */
@@ -43,45 +42,6 @@ function removeAllPieces() {
     square.innerHTML = "";
   });
 }
-
-// const removeAllButton = document.getElementById("remove-all");
-// removeAllButton.addEventListener("click", removeAllPieces);
-
-// /**
-//  * Removes a piece from the specified square.
-//  *
-//  * @param {number} row - The row containing the piece to be removed.
-//  * @param {number} col - The column containing the piece to be removed.
-//  */
-// function removePiece(row, col) {
-//   const square = squares[coordToIndex(row, col)];
-
-//   // Check if the square has any child elements
-//   if (square.children.length > 0) {
-//     // Remove the last child element from the square
-//     square.removeChild(square.lastChild);
-//   }
-// }
-
-// Add click event listener to test button
-// const testButton = document.querySelector(".test");
-// testButton.addEventListener("click", () => {
-//   // console.log([x, y]);
-//   outputTextarea2.value = [x, y, color];
-//   drawPiece(x, y, color);
-// });
-
-// const deletePieceButton = document.querySelector(".deletePiece");
-// const deletePieceText = document.querySelector(".deletePieceText");
-// deletePieceButton.addEventListener("click", () => {
-//   const coordinates = deletePieceText.value.trim().split(",");
-//   if (coordinates.length === 2) {
-//     let row = parseInt(coordinates[0]);
-//     let col = parseInt(coordinates[1]);
-//     console.log(`x: ${row}, y: ${col}`);
-//     removePiece(row, col);
-//   }
-// });
 
 
 /**
@@ -519,14 +479,15 @@ class Debug {
   /**
    * Get the state of the board.
    *
+   * @param {Game} game An instance of the Game class.
    * @returns {string} A string representing the state of the board.
    */
-  getBoardState() {
+  getBoardState(game) {
     let text = "";
     for (let x = 0; x < 6; x++) {
       for (let y = 0; y < 6; y++) {
-        for (let z = 0; z < this.game.activeBoard[x][y].length; z++) {
-          let piece = this.game.activeBoard[x][y][z];
+        for (let z = 0; z < game.activeBoard[x][y].length; z++) {
+          let piece = game.activeBoard[x][y][z];
           text += Number(piece);
         }
         text += "/"
@@ -539,36 +500,38 @@ class Debug {
    * Sets the state of the board based on the input string.
    *
    * @param {string} text - The input string containing the state of the board.
+   * @param {Game} game An instance of the Game class.
    */
-  setBoardState(text) {
-    this.game = new Game();
-    this.game.resetTurn();
+  setBoardState(text, game) {
+    game = new Game();
+    game.resetTurn();
     const values = text.trim().split("/");
     for (let i = 0; i < values.length; i++) {
       const [x, y] = indexToCoord(i);
       for (let j = 0; j < values[i].length; j++) {
         const piece = values[i][j] == 1 ? true : false;
-        this.game.activeBoard[x][y].push(piece);
+        game.activeBoard[x][y].push(piece);
       }
     }
-    drawBoard(this.game.activeBoard)
-    resetEventListeners(this.game);
+    drawBoard(game.activeBoard)
+    resetEventListeners(game);
   }
 
   /**
    * Log the state of the board to the console at regular intervals.
    *
    * @param {number} time The interval in milliseconds.
+   * @param {Game} game An instance of the Game class.
    */
-  logBoardState(time) {
+  logBoardState(time, game) {
     setInterval(() => {
-      const boardState = this.getBoardState();
+      const boardState = this.getBoardState(game);
       this.BoardStateOutput.value = boardState;
       console.log(boardState);
 
-      stateOutput.textContent = `State: ${this.game.state}`;
-      playerOutput.textContent = `Active Player: ${this.game.activePlayer}`;
-      activeTurnOutput.textContent = `Active Turn: ${this.game.activeTurn}`;
+      stateOutput.textContent = `State: ${game.state}`;
+      playerOutput.textContent = `Active Player: ${game.activePlayer}`;
+      activeTurnOutput.textContent = `Active Turn: ${game.activeTurn}`;
     }, time);
   }
 
@@ -576,22 +539,106 @@ class Debug {
    * Adds an event listener to the Load Board button.
    *
    * When the button is clicked, the board state is set to the value of the outputTextarea element.
+   * @param {Game} game An instance of the Game class.
    */
-  addLoadBoardListener() {
+  addLoadBoardListener(game) {
     const loadBoardButton = document.querySelector("#loadBoard");
     loadBoardButton.addEventListener("click", () => {
       const BoardStateInput = document.querySelector("#BoardStateInput");
-      this.setBoardState(BoardStateInput.value);
+      this.setBoardState(BoardStateInput.value, game);
     });
   }
 
 }
 
-function startGame() {
-  g = new Game();
-  debug = new Debug(g);
-  resetEventListeners(g);
-  debug.logBoardState(1000);
-  debug.addLoadBoardListener();
-  document.getElementById("startBtn").disabled = true;
+/**
+ * Sends a POST request to the FastAPI endpoint at serverAddress/create_room to create a new room.
+ *
+ * @param {string} serverAddress - The address of the server.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created room.
+ */
+async function createRoom(serverAddress) {
+  const response = await fetch(`${serverAddress}/create_room`, {method: 'POST'});
+  const data = await response.json();
+  const roomId = data.room_id;
+  return roomId;
 }
+
+// To get the roomID run:
+// createRoom('http://localhost:8000')
+// .then(roomID => console.log(roomID));
+// or the await command
+
+/**
+ * Joins a room on the FastAPI server using a WebSocket connection.
+ *
+ * @param {string} serverAddress - The address of the server.
+ * @param {string} roomId - The ID of the room to join.
+ * @param {function} onMessage - A function to handle incoming messages from the server.
+ * @param {function} onClose - A function to handle the WebSocket connection closing.
+ * @returns {WebSocket} - The WebSocket connection object.
+ */
+function joinRoom(serverAddress, roomId, onOpen, onMessage, onClose) {
+  const socket = new WebSocket(`${serverAddress}/room/${roomId}`);
+  socket.onopen = onOpen;
+  socket.onmessage = onMessage;
+  socket.onclose = onClose;
+  return socket;
+}
+
+/**
+ * Handles opening of a WebSocket connection.
+ * @param {Event} event - The event object.
+ */
+function handleOpen(event) {
+  console.log('WebSocket connection opened', event);
+}
+
+/**
+ * Handles receiving a message through a WebSocket connection.
+ * @param {MessageEvent} event - The event object.
+ */
+function handleMessage(event) {
+  const message = JSON.parse(event.data);
+  console.log(`Received message: ${message}`);
+}
+
+/**
+ * Handles closing of a WebSocket connection.
+ * @param {CloseEvent} event - The event object.
+ */
+function handleClose(event) {
+  console.log(`WebSocket connection closed: ${event.code}`);
+}
+
+/**
+ * Send a turn object through a WebSocket connection.
+ *
+ * @param {WebSocket} socket - The WebSocket connection to use.
+ * @param {Object} turn - The turn object to send.
+ */
+function sendTurn(socket, turn) {
+  const message = JSON.stringify(turn);
+  socket.send(message);
+}
+
+// This is how you can create a websocket connection 
+// const socket = joinRoom(serverAddress, roomId, handleOpen, handleMessage, handleClose);
+// eg. const socket = joinRoom('ws://localhost:8000', "0a8899a8", handleOpen, handleMessage, handleClose);
+
+let g = null;
+
+/**
+ * Initializes a new game object and sets up event listeners.
+ */
+function startGame() {
+  g = new Game(); // Create a new game object
+  debug = new Debug(g); // Create a new debug object
+  resetEventListeners(g); // Set up event listeners for the game
+  debug.logBoardState(1000, g); // Log the current board state
+  debug.addLoadBoardListener(); // Set up event listener for loading a saved board
+  deactivateButton("startGame"); // Disable the start game button
+}
+
+const startGameButton = document.getElementById("startGame");
+startGameButton.addEventListener("click", startGame);
