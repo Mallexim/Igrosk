@@ -578,11 +578,16 @@ async function createRoom(serverAddress) {
  * @param {function} onClose - A function to handle the WebSocket connection closing.
  * @returns {WebSocket} - The WebSocket connection object.
  */
-function joinRoom(serverAddress, roomId, onMessage, onClose) {
+function joinRoom(serverAddress, roomId, onOpen, onMessage, onClose) {
   const socket = new WebSocket(`${serverAddress}/room/${roomId}`);
+  socket.onopen = onOpen;
   socket.onmessage = onMessage;
   socket.onclose = onClose;
   return socket;
+}
+
+function handleOpen(event) {
+  console.log('WebSocket connection opened', event);
 }
 
 function handleMessage(event) {
@@ -595,8 +600,8 @@ function handleClose(event) {
 }
 
 // This is how you can create a websocket connection 
-// const socket = joinRoom(serverAddress, roomId, handleMessage, handleClose);
-
+// const socket = joinRoom(serverAddress, roomId, handleOpen, handleMessage, handleClose);
+// eg. const socket = joinRoom('ws://localhost:8000', "0a8899a8", handleOpen, handleMessage, handleClose);
 
 /**
  * Initializes a new game object and sets up event listeners.
