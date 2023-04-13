@@ -606,10 +606,10 @@ function handleOpen(event) {
  */
 function handleMessage(event) {
       // Parse the JSON string received from the WebSocket connection into a JavaScript object
-      console.log(event);
       const message = JSON.parse(event.data);
+      console.log(message);
       // Store the board array from the message in g.activeBoard
-      g.activeBoard = message;
+      g.activeBoard = message.board;
       // Draw the board
       drawBoard(g.activeBoard);
       // Add the board to the list of boards
