@@ -567,6 +567,23 @@ async function createRoom(serverAddress) {
 // To get the roomID run:
 // createRoom('http://localhost:8000')
 // .then(roomID => console.log(roomID));
+// or the await command
+
+/**
+ * Joins a room on the FastAPI server using a WebSocket connection.
+ *
+ * @param {string} serverAddress - The address of the server.
+ * @param {string} roomId - The ID of the room to join.
+ * @param {function} onMessage - A function to handle incoming messages from the server.
+ * @param {function} onClose - A function to handle the WebSocket connection closing.
+ * @returns {WebSocket} - The WebSocket connection object.
+ */
+function joinRoom(serverAddress, roomId, onMessage, onClose) {
+  const socket = new WebSocket(`${serverAddress}/room/${roomId}`);
+  socket.onmessage = onMessage;
+  socket.onclose = onClose;
+  return socket;
+}
 
 /**
  * Initializes a new game object and sets up event listeners.
