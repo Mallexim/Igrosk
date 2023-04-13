@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 import uuid
 import json
+import ast
 
 from typing import List, Tuple
 import game_logic
@@ -11,7 +12,6 @@ import game_logic
 app = FastAPI()
 
 rooms = {}
-# game = game_logic.Game()
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,31 +31,31 @@ class Room(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-@validator('game')
-def validate_game(cls, v):
-    # Validator for the 'game' field
-    if not isinstance(v, game_logic.Game):
-        # Raise an error if the value is not an instance of game_logic.Game
-        raise ValueError('Value must be an instance of game_logic.Game')
-    return v
+    @validator('game')
+    def validate_game(cls, v):
+        # Validator for the 'game' field
+        if not isinstance(v, game_logic.Game):
+            # Raise an error if the value is not an instance of game_logic.Game
+            raise ValueError('Value must be an instance of game_logic.Game')
+        return v
 
-async def broadcast(self, data: str):
-    # Method for broadcasting data to players as JSON
-    for connection in self.connections:
-        # Send data to each player as a JSON string
-        await connection.send_text(json.dumps(data))
+    async def broadcast(self, data: str):
+        # Method for broadcasting data to players as JSON
+        for connection in self.connections:
+            # Send data to each player as a JSON string
+            await connection.send_text(json.dumps(data))
 
-async def add_player(self, websocket: WebSocket):
-    # Method for adding a player to the game
-    if len(self.connections) < 2:
-        # If there are less than 2 players, add the new player
-        self.connections.append(websocket)
-        await websocket.accept()
-        return True
-    else:
-        # If there are already 2 players, close the connection
-        await websocket.close(code=1008)
-        return False
+    async def add_player(self, websocket: WebSocket):
+        # Method for adding a player to the game
+        if len(self.connections) < 2:
+            # If there are less than 2 players, add the new player
+            self.connections.append(websocket)
+            await websocket.accept()
+            return True
+        else:
+            # If there are already 2 players, close the connection
+            await websocket.close(code=1008)
+            return False
         
 class Drop(BaseModel):
     x: int
@@ -111,9 +111,11 @@ async def join_room(websocket: WebSocket, room_id: str):
                     # Receive data from player's WebSocket connection
                     data = await websocket.receive_text()
                     print(data, type(data))
-                    await room.broadcast("This is what the server received: " + data)
                     # Parse data
-                    # Update game state
+                    # Turn the string list into a python list using the ast module
+                    turn = ast.literal_eval(data)
+                    print(turn, type(turn))
+                    await room.broadcast("This is what the server received: " + str(turn))
                     # Broadcast new game state to all players in room
             except:
                 room.connections.remove(websocket)
@@ -129,17 +131,3 @@ async def get_all_rooms():
     # Endpoint for getting all room keys
     # Returns a list of all room keys in the 'rooms' dictionary
     return list(rooms.keys())
-
-# @app.get('/board')
-# async def board():
-#     return {'board': game.board}
-
-
-# @app.post("/add-drop")
-# async def add_drop(x: int, y: int):
-#     game.add_drop(int(x), int(y))
-
-
-# @app.post("/add_shift")
-# async def add_shift(n: int, d: List):
-#     game.add_shift(n, d)
