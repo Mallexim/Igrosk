@@ -237,6 +237,7 @@ function activateButton(game, buttonId, eventListener) {
  * @param {Object} game - The game object.
  */
 function endTurnButtonEventListener(game) {
+    // sendTurn(s, game.activeTurn)
     game.endTurn();
     removeSquareEventListeners();
     changeSwitch();
@@ -599,8 +600,15 @@ function handleOpen(event) {
  * @param {MessageEvent} event - The event object.
  */
 function handleMessage(event) {
-  const message = JSON.parse(event.data);
-  console.log(`Received message: ${message}`);
+      // Parse the JSON string received from the WebSocket connection into a JavaScript object
+      console.log(event);
+      const message = JSON.parse(event.data);
+      // Store the board array from the message in g.activeBoard
+      g.activeBoard = message;
+      // Draw the board
+      drawBoard(g.activeBoard);
+      // Add the board to the list of boards
+      g.activeBoards.push(JSON.stringify(g.activeBoard));
 }
 
 /**
@@ -620,6 +628,13 @@ function handleClose(event) {
 function sendTurn(socket, turn) {
   const message = JSON.stringify(turn);
   socket.send(message);
+
+  // {
+  //   player: g.activePlayer,
+  //   turn: g.activeTurn,
+  //   board: g.activeBoard,
+  // }
+
 }
 
 // This is how you can create a websocket connection 
