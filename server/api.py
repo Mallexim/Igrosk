@@ -119,10 +119,11 @@ async def join_room(websocket: WebSocket, room_id: str):
                     # Turn the string list into a python list using the ast module
                     turn = ast.literal_eval(data)
                     print(turn, type(turn))
-                    await room.broadcast("This is what the server received: " + str(turn))
+                    # await room.broadcast("This is what the server received: " + str(turn))
                     # Add the turn to the game
                     room.game.add_turn(turn)
                     print(room.game.board)
+                    await room.broadcast(json.dumps(room.game.board))
                     # Broadcast new game state to all players in room
             except:
                 room.connections.remove(websocket)
