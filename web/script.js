@@ -668,6 +668,7 @@ async function createRoomButtonHandler() {
   console.log(`Created new room with ID ${roomId}`);
   document.getElementById('RoomInput').value = roomId;
   activateButton("startGame", null, startGame);
+  deactivateButton("createRoom");
 }
 
 activateButton("createRoom", null, createRoomButtonHandler);
