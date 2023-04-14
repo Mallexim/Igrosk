@@ -663,6 +663,10 @@ function startGame() {
 let roomId = null;
 let socket = null;
 
+/**
+ * Creates a new room and sets the roomId in the RoomInput field.
+ * @async
+ */
 async function createRoomButtonHandler() {
   const serverAddress = document.getElementById('serverInput').value || "localhost:8000";
   roomId = await createRoom("http://" + serverAddress);
@@ -671,7 +675,10 @@ async function createRoomButtonHandler() {
   deactivateButton("createRoom");
 }
 
-async function joinRoomButtonHandler() {
+/**
+ * Joins an existing room and sets the socket for further communication.
+ */
+function joinRoomButtonHandler() {
   const serverAddress = document.getElementById('serverInput').value || "localhost:8000";
   const roomId = document.getElementById('RoomInput').value;
   window.roomId = roomId;
