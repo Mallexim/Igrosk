@@ -130,8 +130,8 @@ function addDropEventListeners(game) {
         game.addDrop(x, y);
         drawBoard(game.activeBoard);
         resetEventListeners(game);
-        activateButton(game, "endTurn", endTurnButtonEventListener);
-        activateButton(game, "undoMove", undoMoveButtonEventListener);
+        activateButton("endTurn", game, endTurnButtonEventListener);
+        activateButton("undoMove", game, undoMoveButtonEventListener);
       });
     }
   });
