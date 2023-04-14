@@ -661,14 +661,28 @@ function startGame() {
 }
 
 let roomId = null;
+let socket = null;
 
 async function createRoomButtonHandler() {
-  const serverAddress = document.getElementById('serverInput').value;
+  const serverAddress = document.getElementById('serverInput').value || "localhost:8000";
   roomId = await createRoom("http://" + serverAddress);
   console.log(`Created new room with ID ${roomId}`);
   document.getElementById('RoomInput').value = roomId;
-  activateButton("startGame", null, startGame);
   deactivateButton("createRoom");
 }
 
+async function joinRoomButtonHandler() {
+  const serverAddress = document.getElementById('serverInput').value || "localhost:8000";
+  const roomId = document.getElementById('RoomInput').value;
+  window.roomId = roomId;
+  if (roomId !== "" && roomId !== null && roomId !== undefined) {
+    socket = joinRoom('ws://' + serverAddress, roomId, handleOpen, handleMessage, handleClose);
+    deactivateButton("joinRoom");
+    deactivateButton("createRoom");
+    activateButton("startGame", null, startGame);
+  }
+}
+
 activateButton("createRoom", null, createRoomButtonHandler);
+activateButton("joinRoom", null, joinRoomButtonHandler);
+
