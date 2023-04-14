@@ -663,8 +663,8 @@ function startGame() {
 let roomId = null;
 
 async function createRoomButtonHandler() {
-  const serverAddress = 'http://localhost:8000';
-  roomId = await createRoom(serverAddress);
+  const serverAddress = document.getElementById('serverInput').value;
+  roomId = await createRoom("http://" + serverAddress);
   console.log(`Created new room with ID ${roomId}`);
   document.getElementById('RoomInput').value = roomId;
   activateButton("startGame", null, startGame);
