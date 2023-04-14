@@ -660,4 +660,18 @@ function startGame() {
   deactivateButton("startGame"); // Disable the start game button
 }
 
+let roomId = null;
+
+/**
+ * Handles the click event for a button that creates a new room.
+ * @param {Event} event - The event object.
+ */
+async function createRoomButtonHandler(event) {
+  const serverAddress = 'http://localhost:8000';
+  roomId = await createRoom(serverAddress);
+  console.log(`Created new room with ID ${roomId}`);
+  document.getElementById('RoomInput').value = roomId;
+}
+
+activateButton("createRoom", null, createRoomButtonHandler);
 activateButton("startGame", null, startGame);
