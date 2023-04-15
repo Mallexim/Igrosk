@@ -9,7 +9,7 @@ import game_logic
 
 
 app = FastAPI()
- 
+
 rooms = {}
 
 app.add_middleware(
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 class Room(BaseModel):
     room_id: str
@@ -63,7 +64,6 @@ class Room(BaseModel):
         # Send the game state to all connected clients
         await self.broadcast(json.dumps(game_state))
 
-
     async def send_to_player(self, data: str, player: WebSocket):
         # Method for sending data to a player as JSON
         await player.send_text(json.dumps(data))
@@ -74,19 +74,23 @@ class Room(BaseModel):
             # If there are less than 2 players, add the new player
             self.connections.append(websocket)
             await websocket.accept()
+            await self.send_to_player({"type": "initialisation", "player": self.connections.index(websocket)}, websocket)
             return True
         else:
             # If there are already 2 players, close the connection
             await websocket.close(code=1008)
             return False
-        
+
+
 class Drop(BaseModel):
     x: int
     y: int
 
+
 class Shift(BaseModel):
     pieces: int
     direction: List[int]
+
 
 class Turn(BaseModel):
     drop: Drop
@@ -155,9 +159,11 @@ async def join_room(websocket: WebSocket, room_id: str):
     else:
         await websocket.close(code=1008)
 
+
 @app.get("/test")
 def hello():
     return {"message": "Hello, World!"}
+
 
 @app.get("/room")
 async def get_all_rooms():
