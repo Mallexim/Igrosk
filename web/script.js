@@ -649,6 +649,7 @@ function sendTurn(socket, turn) {
  */
 function sendGameState(socket, game) {
   const message = JSON.stringify({
+    type: "game_state",
     player: game.activePlayer,
     turn: game.activeTurn,
     board: game.activeBoard,
