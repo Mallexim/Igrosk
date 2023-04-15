@@ -53,6 +53,7 @@ class Room(BaseModel):
         """
         # Create a dictionary containing the game state
         game_state = {
+            "type": "game_state",
             "active_player": self.game.curr_player,
             "board": self.game.board,
             "current_turn": self.game.log[-1],
