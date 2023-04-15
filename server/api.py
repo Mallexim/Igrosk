@@ -147,8 +147,6 @@ async def join_room(websocket: WebSocket, room_id: str):
                     print(room.game.board)
                     # Broadcast new game state to all players in room
                     await room.broadcast_game_state()
-                    # End turn
-                    room.game.end_turn();
             except:
                 # Log when a player leaves a room
                 print(f"Player {websocket} left room {room_id}")
