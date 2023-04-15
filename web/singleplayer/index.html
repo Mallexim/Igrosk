@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Igrosk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="bcontainer">
+      <aside>
+        <div>
+          <h3 title="Igrosk">Igrosk</h3>
+        </div>
+        <div>
+          <label class="switch circle light active"></label>
+          <label class="switch circle dark"></label>
+        </div>
+      </aside>
+      <div class="chess-board">
+        <div class="row">
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+        </div>
+        <div class="row">
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+        </div>
+        <div class="row">
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+        </div>
+        <div class="row">
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+        </div>
+        <div class="row">
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+        </div>
+        <div class="row">
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+          <div class="square black"></div>
+          <div class="square white"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ccontainer">
+      <div style="display: flex; flex-direction: column;">
+        <button id="startGame">Start Game</button>
+        <button id="undoMove">Undo</button>
+        <button id="endTurn">End Turn</button>
+    </div>
+      <div id="debug" class="card" style="display: none;">
+        <input id="BoardStateOutput" readonly></input></br>
+        <input id="BoardStateInput"></input>
+        <button id="loadBoard" class="active">Load</button></br>
+        <span id="stateOutput"></span></br>
+        <span id="playerOutput"></span></br>
+        <span id="activeTurnOutput"></span></br>
+      </div>
+      <div class="card">
+        <h3>Info</h3>
+        <p>
+          You can find the rules in our <a href="https://github.com/Mallexim/Igrosk">GitHub</a>.
+
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
