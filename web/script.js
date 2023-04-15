@@ -240,7 +240,7 @@ function activateButton(buttonId, game, eventListener) {
  * @param {Object} game - The game object.
  */
 function endTurnButtonEventListener(game) {
-  // sendGameState(s, game.activeTurn)
+  sendGameState(socket, game);
   game.endTurn();
   removeSquareEventListeners();
   changeSwitch();
