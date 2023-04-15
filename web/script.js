@@ -608,12 +608,24 @@ function handleMessage(event) {
   // Parse the JSON string received from the WebSocket connection into a JavaScript object
   const message = JSON.parse(event.data);
   console.log(message);
-  // Store the board array from the message in g.activeBoard
-  g.activeBoard = message.board;
-  // Draw the board
-  drawBoard(g.activeBoard);
-  // Add the board to the list of boards
-  g.activeBoards.push(JSON.stringify(g.activeBoard));
+
+  // Switch statement that checks the type of message
+  switch (message.type) {
+    case "initialisation":
+      g.activePlayer = message.player;
+      break;
+    case "game_state":
+      // Handle game state message
+      // g.activePlayer = message.active_player;
+      g.activeBoard = message.board;
+      // g.currentTurn = message.current_turn;
+      g.winner = message.winner;
+      drawBoard(g.activeBoard);
+      break;
+    default:
+      // Handle unknown message type
+      break;
+  }
 }
 
 /**
@@ -657,13 +669,13 @@ function sendGameState(socket, game) {
   socket.send(message);
 }
 
-let g = null;
+let g = new Game();
 
 /**
  * Initializes a new game object and sets up event listeners.
  */
 function startGame() {
-  g = new Game(); // Create a new game object
+  // g = new Game(); // Create a new game object
   debug = new Debug(g); // Create a new debug object
   resetEventListeners(g); // Set up event listeners for the game
   debug.logBoardState(1000, g); // Log the current board state
