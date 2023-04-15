@@ -241,10 +241,10 @@ function activateButton(buttonId, game, eventListener) {
  */
 function endTurnButtonEventListener(game) {
   sendGameState(socket, game);
-  game.endTurn();
+  // game.endTurn();
   removeSquareEventListeners();
-  changeSwitch();
-  resetEventListeners(game);
+  // changeSwitch();
+  // resetEventListeners(game);
 }
 
 /**
@@ -426,7 +426,7 @@ class Game {
    */
   endTurn() {
     this.activeBoards = this.activeBoards.slice(-1);
-    this.activePlayer = !this.activePlayer;
+    // this.activePlayer = !this.activePlayer;
     this.log.push(this.activeTurn);
     this.resetTurn();
   }
@@ -618,9 +618,14 @@ function handleMessage(event) {
       // Handle game state message
       // g.activePlayer = message.active_player;
       g.activeBoard = message.board;
+      drawBoard(g.activeBoard);
       // g.currentTurn = message.current_turn;
       g.winner = message.winner;
-      drawBoard(g.activeBoard);
+      if (message.active_player == g.activePlayer) {
+          endTurn();
+          resetEventListeners(g);
+      }
+      
       break;
     default:
       // Handle unknown message type
