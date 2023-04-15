@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 import uuid
 import json
-import ast
 
 from typing import List, Tuple
 import game_logic
@@ -98,8 +97,8 @@ async def create_room():
     """
     Create a new room with a unique ID and game instance.
 
-    This endpoint creates a new room with a unique ID generated using the uuid library. 
-    A new instance of the game_logic.Game class is also created and assigned to the room. 
+    This endpoint creates a new room with a unique ID generated using the uuid library.
+    A new instance of the game_logic.Game class is also created and assigned to the room.
     The new room is then added to the 'rooms' dictionary and its ID is returned in the response.
 
     Returns:
@@ -108,6 +107,10 @@ async def create_room():
     room_id = str(uuid.uuid4())[:8]
     new_room = Room(room_id=room_id, game=game_logic.Game())
     rooms[room_id] = new_room
+
+    # Log when a new room is created
+    print(f"New room created with ID {room_id}")
+
     return {"room_id": room_id, "message": f"Room {room_id} created"}
 
 
@@ -116,8 +119,8 @@ async def join_room(websocket: WebSocket, room_id: str):
     """
     Join a room with the specified ID.
 
-    This endpoint allows a player to join a room with the specified ID using a WebSocket connection. 
-    If the room exists and has less than 2 players, the player is added to the room and can start sending and receiving data. 
+    This endpoint allows a player to join a room with the specified ID using a WebSocket connection.
+    If the room exists and has less than 2 players, the player is added to the room and can start sending and receiving data.
     If the room does not exist or is full, the WebSocket connection is closed.
 
     Args:
@@ -129,24 +132,26 @@ async def join_room(websocket: WebSocket, room_id: str):
         room = rooms[room_id]
         success = await room.add_player(websocket)
         if success:
+            # Log when a player joins a room
+            print(f"Player {websocket} joined room {room_id}")
             try:
                 while True:
                     # Receive data from player's WebSocket connection
-                    data = await websocket.receive_text()
+                    data = json.loads(await websocket.receive_text())
                     print(data, type(data))
                     # Parse data
-                    # Turn the string list into a python list using the ast module
-                    turn = ast.literal_eval(data["turn"])
+                    turn = data["turn"]
                     print(turn, type(turn))
-                    # await room.broadcast("This is what the server received: " + str(turn))
                     # Add the turn to the game
                     room.game.add_turn(turn)
                     print(room.game.board)
                     # Broadcast new game state to all players in room
                     await room.broadcast_game_state()
                     # End turn
-                    room.game.end_turn;
+                    room.game.end_turn();
             except:
+                # Log when a player leaves a room
+                print(f"Player {websocket} left room {room_id}")
                 room.connections.remove(websocket)
     else:
         await websocket.close(code=1008)
