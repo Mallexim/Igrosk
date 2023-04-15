@@ -240,11 +240,11 @@ function activateButton(buttonId, game, eventListener) {
  * @param {Object} game - The game object.
  */
 function endTurnButtonEventListener(game) {
-    // sendTurn(s, game.activeTurn)
-    game.endTurn();
-    removeSquareEventListeners();
-    changeSwitch();
-    resetEventListeners(game);
+  // sendGameState(s, game.activeTurn)
+  game.endTurn();
+  removeSquareEventListeners();
+  changeSwitch();
+  resetEventListeners(game);
 }
 
 /**
@@ -254,9 +254,9 @@ function endTurnButtonEventListener(game) {
  * @param {Object} game - The game object.
  */
 function undoMoveButtonEventListener(game) {
-    game.undoMove();
-    drawBoard(game.activeBoard);
-    resetEventListeners(game);
+  game.undoMove();
+  drawBoard(game.activeBoard);
+  resetEventListeners(game);
 }
 
 /**
@@ -564,7 +564,7 @@ class Debug {
  * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created room.
  */
 async function createRoom(serverAddress) {
-  const response = await fetch(`${serverAddress}/create_room`, {method: 'POST'});
+  const response = await fetch(`${serverAddress}/create_room`, { method: 'POST' });
   const data = await response.json();
   const roomId = data.room_id;
   return roomId;
@@ -605,15 +605,15 @@ function handleOpen(event) {
  * @param {MessageEvent} event - The event object.
  */
 function handleMessage(event) {
-      // Parse the JSON string received from the WebSocket connection into a JavaScript object
-      const message = JSON.parse(event.data);
-      console.log(message);
-      // Store the board array from the message in g.activeBoard
-      g.activeBoard = message.board;
-      // Draw the board
-      drawBoard(g.activeBoard);
-      // Add the board to the list of boards
-      g.activeBoards.push(JSON.stringify(g.activeBoard));
+  // Parse the JSON string received from the WebSocket connection into a JavaScript object
+  const message = JSON.parse(event.data);
+  console.log(message);
+  // Store the board array from the message in g.activeBoard
+  g.activeBoard = message.board;
+  // Draw the board
+  drawBoard(g.activeBoard);
+  // Add the board to the list of boards
+  g.activeBoards.push(JSON.stringify(g.activeBoard));
 }
 
 /**
@@ -641,10 +641,20 @@ function sendTurn(socket, turn) {
   // }
 
 }
-
-// This is how you can create a websocket connection 
-// const socket = joinRoom(serverAddress, roomId, handleOpen, handleMessage, handleClose);
-// eg. const socket = joinRoom('ws://localhost:8000', "0a8899a8", handleOpen, handleMessage, handleClose);
+/**
+ * Sends the current game state to a given socket.
+ *
+ * @param {WebSocket} socket - The socket to send the message to.
+ * @param {Object} game - The game object containing the current player, turn, and board.
+ */
+function sendGameState(socket, game) {
+  const message = JSON.stringify({
+    player: game.activePlayer,
+    turn: game.activeTurn,
+    board: game.activeBoard,
+  });
+  socket.send(message);
+}
 
 let g = null;
 
@@ -692,4 +702,3 @@ function joinRoomButtonHandler() {
 
 activateButton("createRoom", null, createRoomButtonHandler);
 activateButton("joinRoom", null, joinRoomButtonHandler);
-
